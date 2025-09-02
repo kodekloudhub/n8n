@@ -1,0 +1,358 @@
+{
+  "name": "Main Workflow Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1ay52vzrhX4EpogpfP11-CaJEufyyckpz",
+          "mode": "list",
+          "cachedResultName": "Image to Video KodeKloud",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1ay52vzrhX4EpogpfP11-CaJEufyyckpz"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -128
+      ],
+      "id": "0a37182c-6b9c-4d88-bcba-8cbb8d2dbfb7",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "eRPFvrf6Z8fHQDkZ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "888347235",
+        "file": "={{ $json.webContentLink }}",
+        "additionalFields": {
+          "caption": "=You've uploaded this photo to the G Folder"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        -128
+      ],
+      "id": "e9e323ad-4fac-4b6a-9523-9c2ea906a220",
+      "name": "Telegram",
+      "webhookId": "ab27f2b6-55d9-4d8a-8d43-808e1a00169b",
+      "credentials": {
+        "telegramApi": {
+          "id": "HO4KjPSpXsYWKcMh",
+          "name": "Telegram Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1y3z2z1NgGbr-1bkVvOyqcD4ZAz9K-kpk3biSqwSRpMY",
+          "mode": "list",
+          "cachedResultName": "Image to Video Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y3z2z1NgGbr-1bkVvOyqcD4ZAz9K-kpk3biSqwSRpMY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y3z2z1NgGbr-1bkVvOyqcD4ZAz9K-kpk3biSqwSRpMY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Image URL": "={{ $('Google Drive Trigger').item.json.webContentLink }}",
+            "Date": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "7d1240e4-0c9c-4e7f-afcf-69967e1a2e39",
+      "name": "Image Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iC7PDE8OXyZvXAo4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "RZZCnAP6m6PqGOPf",
+          "mode": "list",
+          "cachedResultName": "Subworkflow Demo"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        -128
+      ],
+      "id": "3121710d-ecbf-4a19-b3a3-79a7e4c28651",
+      "name": "Execute Workflow"
+    }
+  ],
+  "pinData": {
+    "Google Drive Trigger": [
+      {
+        "json": {
+          "parents": [
+            "1ay52vzrhX4EpogpfP11-CaJEufyyckpz"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Marconi Darmawan",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "14491281325317365533",
+            "emailAddress": "marconi@kodekloud.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Marconi Darmawan",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "14491281325317365533",
+              "emailAddress": "marconi@kodekloud.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "anyoneWithLink",
+              "type": "anyone",
+              "role": "reader",
+              "allowFileDiscovery": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "14491281325317365533",
+              "type": "user",
+              "emailAddress": "marconi@kodekloud.com",
+              "role": "owner",
+              "displayName": "Marconi Darmawan",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "anyoneWithLink",
+            "14491281325317365533"
+          ],
+          "imageMediaMetadata": {
+            "width": 1024,
+            "height": 1322,
+            "rotation": 0
+          },
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG",
+          "name": "1 (3).jpeg",
+          "mimeType": "image/jpeg",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "3",
+          "webContentLink": "https://drive.google.com/uc?id=1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/image/jpeg",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBMB9NlQiNKdNBppGAG2rXUB4CNS9ZOkq94FcIMBEmT9QohKIQnjiohXZWVCrbTnr7XOQ4sJu0-USnuv_SNoz1uw9HMuIiLLlyfuAs6nyDDbra8=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-08-06T04:59:37.952Z",
+          "createdTime": "2025-08-06T04:59:37.952Z",
+          "modifiedTime": "2025-08-06T04:15:16.000Z",
+          "modifiedByMeTime": "2025-08-06T04:15:16.000Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "1 (3).jpeg",
+          "fullFileExtension": "jpeg",
+          "fileExtension": "jpeg",
+          "md5Checksum": "f4ed5bba0c45bd9fa1612c8f68fd010a",
+          "sha1Checksum": "c44fb5ab69ab0a10a606f290f4201e603e52588e",
+          "sha256Checksum": "a8746be62338eeea6b48068806e2678d4af7ec64e0bc997f34d9849318481102",
+          "size": "294811",
+          "quotaBytesUsed": "294811",
+          "headRevisionId": "0Bw89TXLU6fojZVR6ZTA1SHZvRSt2ZjNXRjVlYWtVRTRRUkxBPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Image Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Log": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6bd10692-5980-43c1-94c9-b17f97ce5851",
+  "meta": {
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "Hpqbed1TJ53mzvHM",
+  "tags": []
+}

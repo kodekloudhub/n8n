@@ -1,0 +1,320 @@
+{
+  "name": "Text-to-image Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cc874945-9bfa-495e-ae17-5d8d2323619b",
+      "name": "When chat message received",
+      "webhookId": "bcdf32fe-4056-4acd-9f98-f592b9c2b374"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.chatInput }}"
+            },
+            {
+              "content": "You are an expert Text-to-Image Generation Prompt Engineer, working inside an n8n automation.\nYour only task is to generate clear, vivid, and effective prompts to be passed into an image generation API.\nYou do not output any explanations, commentary, or formatting. Return only the prompt string to generate the image.\n\n🔒 Constraints:\n\nOutput a single-line, coherent prompt optimized for high-quality image generation.\n\nDo not include prompt metadata (e.g., aspect ratio, resolution, model name, seed).\n\nYou must not respond with markdown, code blocks, or labels. Output the prompt text only.\n\nDo not explain or summarize your reasoning. Output the final result only.\n\n🧠 Prompt Engineering Guidelines:\n\nTranslate vague descriptions into rich visual details.\n\nEnhance prompt with descriptors: lighting, mood, environment, composition, art style.\n\nUse cinematic or artistic keywords where relevant (e.g., \"digital art,\" \"studio lighting,\" \"depth of field\").\n\nResolve ambiguities. Clarify unclear requests into visually distinct concepts.\n\n✅ Your output should resemble this format:\n\n“A serene mountain lake at sunrise, surrounded by pine trees, mist rolling over the water, soft golden light, cinematic atmosphere, ultra-realistic style”",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a13704b7-4535-4c5b-922b-f3193c66f8ab",
+      "name": "Image Prompt Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "rYzIV6Q0zSN2vZuq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.wavespeed.ai/api/v3/predictions/{{ $json.data.id }}/result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "5553f1c0-8c7e-4016-92fc-2ea29c74944a",
+      "name": "Wavespeed Get",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wgrx2bF5FXfRDT0c",
+          "name": "Wavespeed AI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wavespeed.ai/api/v3/bytedance/seedream-v3",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "enable_base64_output",
+              "value": "false"
+            },
+            {
+              "name": "enable_sync_mode",
+              "value": "false"
+            },
+            {
+              "name": "guidance_scale",
+              "value": "2.5"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.message.content }}"
+            },
+            {
+              "name": "seed",
+              "value": "-1"
+            },
+            {
+              "name": "size",
+              "value": "1024*1322"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "5de33d10-4517-4aca-bd32-3d166162dc01",
+      "name": "Wavespeed Post",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wgrx2bF5FXfRDT0c",
+          "name": "Wavespeed AI Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        0
+      ],
+      "id": "33c50af4-f8fe-4d00-9bc2-e36081bfe13d",
+      "name": "Wait 15 Seconds",
+      "webhookId": "22376332-ed68-4f59-9e46-2b0b7296fd2f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ce3a92f2-004b-4472-8ce3-6c43c4fc882c",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "ff53ee08-c6f4-4974-9f73-d3f063b8cec3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "c1f3b56f-fd0c-4d5e-a2d9-d9a6ac53737e",
+      "name": "Wait Another 15 Secs",
+      "webhookId": "d33728d9-8861-46cf-aca2-36c11724e99e"
+    },
+    {
+      "parameters": {
+        "sendTo": "test@abc.com",
+        "subject": "=Image Generated - {{ $now }}",
+        "message": "={{ $json.data.outputs[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        -16
+      ],
+      "id": "74832eef-ad02-4fe6-8d8c-22e0d1c33c9f",
+      "name": "Send a message",
+      "webhookId": "9e2d0072-7b7e-431a-a8cb-90ee39183a0f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "g9AwnP8Jf3n6yAhc",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Image Prompt Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prompt Agent": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Post": {
+      "main": [
+        [
+          {
+            "node": "Wait 15 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Get": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Another 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Another 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "37360eaa-b6fd-4651-96c3-ee3e91ccef86",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "GeDMsYNg6bF3SvXb",
+  "tags": []
+}

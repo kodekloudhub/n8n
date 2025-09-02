@@ -1,0 +1,278 @@
+{
+  "name": "Text-to-video SubWorkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json['Video Idea'] }}"
+            },
+            {
+              "content": "=You are an expert Text-to-Video Generation Prompt Engineer, working inside an n8n automation.\nYour only task is to generate clear, vivid, and effective prompts to be passed into a video generation API.\nYou do not output any explanations, commentary, or formatting. Return only the prompt string to generate the video.\n\n🔒 Constraints:\n\nOutput a single-line, coherent prompt optimized for high-quality video generation.\n\nInclude only characters and numbers, no special characters like \"\"# \" ! ()\"\"\n\nDo not include prompt metadata (e.g., duration, resolution, frame rate, model name, seed).\n\nYou must not respond with markdown, code blocks, or labels. Output the prompt text only.\n\nDo not explain or summarize your reasoning. Output the final result only.\n\n🧠 Prompt Engineering Guidelines:\n\nTranslate vague descriptions into rich, dynamic scene details.\n\nEnhance prompt with descriptors: motion, pacing, mood, environment, lighting, cinematic style.\n\nUse cinematic or artistic keywords where relevant (e.g., \"sweeping aerial shot,\" \"shallow depth of field,\" \"dramatic lighting\").\n\nResolve ambiguities. Clarify unclear requests into visually distinct and dynamic concepts.\n\n✅ Your output should resemble this format:\n\n“A sweeping aerial shot of a futuristic city at dusk, flying over neon-lit skyscrapers, glowing billboards flickering, light rain falling, reflections on glass, moody synthwave atmosphere, cinematic style”",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        224,
+        0
+      ],
+      "id": "133f3929-ab9e-481b-b293-061b85ca2f30",
+      "name": "Video Prompt Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "rYzIV6Q0zSN2vZuq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wavespeed.ai/api/v3/google/veo3-fast",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"aspect_ratio\": \"16:9\",\n  \"duration\": 8,\n  \"generate_audio\": true,\n  \"prompt\": \"{{ $json.message.content }}\",\n  \"resolution\": \"720p\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "f4db6cbe-4c53-4baf-b600-0b2d6229e069",
+      "name": "Wavespeed Post",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "7b80e69f-5c69-444b-9fe7-1b58663d0356",
+      "name": "Wait 15 Secs",
+      "webhookId": "50165773-6711-4486-9563-2a489a25e2f3"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.wavespeed.ai/api/v3/predictions/{{ $json.data.id }}/result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "168a9a2f-cb5b-4cd5-a902-2b2f9c6dc7dc",
+      "name": "Wavespeed Get",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f0754090-65f3-4bbb-b02b-1d2a6b68de08",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "d21d2cb7-0681-4efa-9ad4-6a7c6e22289a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        224
+      ],
+      "id": "84fc051c-0a9d-43a5-927c-7def4d056d76",
+      "name": "Wait another 15 Secs",
+      "webhookId": "676deeed-22d4-4260-a7ac-8a2cec3a2035"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Video Idea"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3cdfa690-bc08-42fc-a893-4a18e7a8b216",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "Video Idea": "Instagram Reel — “Kubernetes in a Game‑of‑Thrones‑Inspired Realm”\nDuration: 40–45s, 1080x1920 (vertical), safe margins respected, burned‑in subtitles.\nTone: Epic medieval fantasy, cinematic, confident, educational.\nMusic: Royalty‑free epic orchestral (cellos, horns, taiko drums), 110–120 BPM. No copyrighted themes.\nSFX: Wind, raven caws, sword unsheath, marching drums, gate creak, dragon whoosh (generic), fire crackle, snow gust.\nColor grade: Cold winter blues + warm torchlight ambers. Film grain 10–15%.\nTypography: Medieval serif display for headers (large, 6–7 words max), clean sans‑serif for small labels.\nVisual motifs: Parchment maps, castle keeps = nodes, banners = namespaces, soldiers = pods, ravens = services, gates = ingress, wheel/helm icon = Kubernetes (use a generic nautical wheel, not the trademarked logo).\n\nHook (0–3s)\nVisual: Dark screen → sparks → silhouette of a throne made of server racks forms. Quick sword unsheath SFX, snow gust.\nOn‑screen text: “In the Realm of Cloud…”\nVO: “In the realm of cloud, order conquers chaos.”\nTransition: Parchment‑burn wipe to map.\n\nScene 1 — Clusters as Kingdoms (3–9s)\nVisual: Parchment map animates; three glowing regions labeled Dev, Stage, Prod. A crown icon over each control plane keep.\nOn‑screen text: “Clusters = Kingdoms”\nVO: “Clusters rise as kingdoms, ruled by control planes.”\n\nScene 2 — Nodes & Pods (9–15s)\nVisual: Castle courtyards (nodes) with formations of soldiers (pods). Banners show namespace sigils.\nOn‑screen text: “Pods march on Nodes”\nVO: “Nodes host brave pods—containers marching in formation.”\nSFX: Distant drums; banners flap in wind.\n\nScene 3 — Scaling for Battle (15–22s)\nVisual: Storm gathers over the map; horns. Replicas multiply as enemies approach city walls.\nOn‑screen text: “Autoscale when traffic attacks”\nVO: “When traffic attacks, autoscalers rally the bannermen.”\nSFX: Horn blast; marching intensifies.\n\nScene 4 — Services & Ingress (22–30s)\nVisual: Fortress gates open; glowing paths route travelers to the right keeps. Ravens launch and perch on signposts.\nOn‑screen text: “Stable networking & routing”\nVO: “Services and Ingress keep the gates and guide every traveler.”\nSFX: Gate creak; raven caw.\n\nScene 5 — Self‑Healing (30–36s)\nVisual: A dragon of chaos scorches one keep (a node flickers out). Pods instantly redeploy to neighboring keeps.\nOn‑screen text: “Self‑healing resilience”\nVO: “Even when a keep falls, the realm heals and endures.”\nSFX: Whoosh; embers; quick rebuild chimes.\n\nScene 6 — Helm & Operators (36–41s)\nVisual: Crown and scroll unfurl over a workbench. Runes (YAML) glow as charts apply.\nOn‑screen text: “Helm, Operators, GitOps”\nVO: “Helm charts and Operators codify ancient runes—GitOps rules the land.”\n\nEnd Card / CTA (41–45s)\nVisual: Nautical wheel crest over map with animated snow. Subtle UI snippets (kubectl apply, HPA metrics) in the background.\nOn‑screen text (large): “Rule your Realm with Kubernetes”\nSubtext: “Follow for DevOps lore”\nVO: “Rule your realm with Kubernetes.”\n\nEditing & Delivery Notes\n- Keep text under 7 words per card and center‑safe.\n- Fast cuts every 1.5–2.5s; anchor beats on drum hits.\n- Use parchment‑edge vignettes between scenes; occasional raven whip‑pan transitions.\n- Add subtle code‑rain overlay at 20% opacity during map shots.\n- Include auto‑captions and ensure high contrast.\n- Export H.264, 10–12 Mbps, 30 fps.\n\nB‑roll / Asset Suggestions\n- Medieval map/fortress CGI or stylized motion graphics.\n- Generic nautical wheel icon (non‑branded) for Kubernetes reference.\n- Abstract container/pod icons; gate/road routing animation; raven silhouette.\n- Stock SFX listed above; royalty‑free epic track.\n\nScript (for VO & Subtitles)\n0.0–1.0s: “In the realm of cloud…”\n1.0–3.0s: “…order conquers chaos.”\n3.0–6.0s: “Clusters rise as kingdoms, ruled by control planes.”\n9.0–12.0s: “Nodes host brave pods—containers marching in formation.”\n15.0–18.0s: “When traffic attacks, autoscalers rally the bannermen.”\n22.0–26.0s: “Services and Ingress keep the gates and guide every traveler.”\n30.0–33.0s: “Even when a keep falls, the realm heals and endures.”\n36.0–39.0s: “Helm charts and Operators codify ancient runes—GitOps rules the land.”\n41.0–44.0s: “Rule your realm with Kubernetes.”"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Video Prompt Agent": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Post": {
+      "main": [
+        [
+          {
+            "node": "Wait 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Get": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait another 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait another 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Video Prompt Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f40ab70-ad86-4d5b-841a-3866a92e1708",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "QElT0IlL5WtdL9X1",
+  "tags": []
+}

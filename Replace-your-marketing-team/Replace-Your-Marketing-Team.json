@@ -1,0 +1,481 @@
+{
+  "name": "Lab 10: Replace Your Marketing Team copy",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        -416
+      ],
+      "id": "1e66fb77-0316-4fdd-a5fe-b34597746b26",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "Marketing Team Master Agent (Connect & Configure Output trigger of your choice) - \nby default it will respond to chat",
+        "height": 304,
+        "width": 652,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -832
+      ],
+      "id": "ee1d7aea-2474-485a-8424-fb80730e85f5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Copywriting Team",
+        "height": 220,
+        "width": 368,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -496
+      ],
+      "id": "a9fe2050-493d-40d9-84f7-b3c8bc212e3a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "GPT-5 LLM\n",
+        "height": 220,
+        "width": 440,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -496
+      ],
+      "id": "8e50662e-d8da-4ac2-b78c-7dc6798e68c2",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -416
+      ],
+      "id": "8157b0f3-06f9-4988-a927-a91eca4f12bf",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        -416
+      ],
+      "id": "8754d426-5640-4e36-89f8-caada2cc9cfb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HRfNSBRMC9bml8dG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Content Creation",
+        "height": 220,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -496
+      ],
+      "id": "d2705e6b-d9c0-4d19-9b2f-42d067649623",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# Overview\nYou are a marketing team AI agent. Your job is to help the user create images and videos based on the request, create written blogpost content, for social media and content marketing. Always look out for which one the user is asking for.\n\n## Tools\nCreate_Image - Use this to create an image. Send the requested image idea to this tool.\nCreate_Video - Use this to create a video. Send the requested video idea to this tool.\nCaption_Writer_Agent - Use this tool to attach accompanying image or Video based on user's request.\nBlogpost_Copywriter - Use this tool to write a Blogpost. Give it the appropriate idea based on user's request\nResearch With Perplexity tool - use this tool to research latest information when required or asked, in order to post on the most relevant topics/content\n\n## Instructions\n- Call the appropriate tool based on user inputs. For example if the user says create a LI post about the latest development in EKS, call the Create_Image tool to create the image, and afterwards call the _Caption_Writer_Agent tool to provide the captions.\n\n## Output\n- Make sure to return the image or video as well as captions. Or in the case of blogpost, return the google doc link\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -128,
+        -768
+      ],
+      "id": "302ca3f9-11a9-49a6-ab54-8e16bfbcd096",
+      "name": "Marketing Team Master Agent"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to generate image content. Only parse through the image idea.",
+        "workflowId": {
+          "__rl": true,
+          "value": "zxDxAABkH72hqQK4",
+          "mode": "list",
+          "cachedResultName": "Text-to-image Subworflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Image Idea Input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Image_Idea_Input', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Video Script"
+          ],
+          "schema": [
+            {
+              "id": "Image Idea Input",
+              "displayName": "Image Idea Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        -416
+      ],
+      "id": "b5769dd3-1a24-4e1f-9f6e-dff8ccdfad8f",
+      "name": "Create_Image"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to generate video content. Only parse through the video idea.",
+        "workflowId": {
+          "__rl": true,
+          "value": "QElT0IlL5WtdL9X1",
+          "mode": "list",
+          "cachedResultName": "Text-to-video SubWorkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video Idea": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Video_Idea', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Video Script"
+          ],
+          "schema": [
+            {
+              "id": "Video Idea",
+              "displayName": "Video Idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -416
+      ],
+      "id": "6f4ef87d-f8a5-429f-9ed4-aa34aee0b2e0",
+      "name": "Create_Video"
+    },
+    {
+      "parameters": {
+        "name": "caption_writer_agent",
+        "description": "Call this tool to write captions for social media",
+        "workflowId": {
+          "__rl": true,
+          "value": "CKFjLLQ45WZbBhIN",
+          "mode": "list",
+          "cachedResultName": "Caption Copywriter subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Caption Idea": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Caption_Idea', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Caption Idea"
+          ],
+          "schema": [
+            {
+              "id": "Caption Idea",
+              "displayName": "Caption Idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        -416
+      ],
+      "id": "259b60d8-a881-44be-917c-17e6d0a36c82",
+      "name": "Caption_Writer_Agent"
+    },
+    {
+      "parameters": {
+        "name": "Blogpost_Copywriter",
+        "description": "Call this tool to write Blogpost. Provide only the Blogpost Idea.",
+        "workflowId": {
+          "__rl": true,
+          "value": "BjqYKpe9ryDgFACT",
+          "mode": "list",
+          "cachedResultName": "Blogpost Copywriter subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Blogpost Idea": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Blogpost_Idea', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Blogpost Idea"
+          ],
+          "schema": [
+            {
+              "id": "Blogpost Idea",
+              "displayName": "Blogpost Idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        -416
+      ],
+      "id": "5c62893a-7ba5-4506-9b6f-a5928dd2b0f7",
+      "name": "Blogpost_Copywriter"
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "simplify": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify_Output', ``, 'boolean') }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -432
+      ],
+      "id": "affcbb48-7a29-42ae-b22d-4311cc65513b",
+      "name": "Research With Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "0meEiGw0CCg03Hg8",
+          "name": "Perplexity account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Research Tool",
+        "height": 220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -496
+      ],
+      "id": "a20a0750-d696-40e9-8e28-8be69c87cce0",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -768
+      ],
+      "id": "39d4b797-2071-424b-bbaa-a3ec9c8fbd24",
+      "name": "When chat message received",
+      "webhookId": "b555f5ea-69b0-455e-8f7e-4b961f3ded2c"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Team Master Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Create_Image": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create_Video": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption_Writer_Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blogpost_Copywriter": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research With Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Marketing Team Master Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2181f22a-6e01-455f-b9cf-8dd441d68e38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "umkWQIxq2gkcMxV3",
+  "tags": []
+}

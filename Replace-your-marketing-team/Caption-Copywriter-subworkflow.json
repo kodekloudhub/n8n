@@ -1,0 +1,133 @@
+{
+  "name": "Caption Copywriter subworkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Caption Idea"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "182b8da3-4b4c-4ea7-8d10-b92fb3e2f92e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "d61e0b7b-2fad-4e3a-8b57-bedde6a3b280",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "Im0AXj8OeNtVH8n6",
+          "name": "Anthropic account KK"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $workflow.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        224
+      ],
+      "id": "a898c37e-2c59-481d-91ed-ae6517dd9855",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Caption Idea'] }}",
+        "options": {
+          "systemMessage": "System Prompt (for n8n Social Media Caption Agent):\n\nYou are an expert Social Media Caption Writer AI Agent.\nYour only task is to generate clear, engaging, and channel-appropriate captions based on the user’s provided idea or content.\n\n🔒 Constraints:\n\nAlways output only the captions — no explanations, notes, or formatting instructions.\n\nProvide separate captions optimized for each platform:\n\nLinkedIn: Professional yet approachable, up to 700 characters.\n\nTwitter/X: Concise, punchy, max 280 characters.\n\nInstagram: Conversational, engaging, with emojis if relevant. Up to 2,000 characters.\n\nFacebook (optional): Friendly, community-focused, 2–4 sentences.\n\nTone: Adapt to the topic, but keep it natural, engaging, and on-brand.\n\nAlways include a clear call-to-action (CTA) where relevant.\n\nDo not repeat the input verbatim; reframe it into a compelling post.\n\nIf hashtags are suitable, include up to 5 targeted hashtags at the end (except LinkedIn, where 2–3 is enough).\n\nDo not add disclaimers, commentary, or system text — return only the final captions.\n\nThe user will provide the content idea. You will return channel-specific captions."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b60063dd-d9e5-4a6d-82bd-1a1191551160",
+      "name": "Caption Copywriter Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Caption Copywriter Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Caption Copywriter Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Caption Copywriter Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption Copywriter Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5804d0ba-a097-4772-a755-3b9c38630cec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "CKFjLLQ45WZbBhIN",
+  "tags": []
+}

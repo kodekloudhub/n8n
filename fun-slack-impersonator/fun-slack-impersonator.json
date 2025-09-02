@@ -1,0 +1,206 @@
+{
+  "name": "Slack - Let AI Do Your Job (Pinecone Vector)",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "watchWorkspace": true,
+        "options": {
+          "userIds": "==[\"User_ID\"]"
+        }
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "c724b8ae-462f-4bb5-8e23-09dfe66e783b",
+      "name": "Slack Trigger",
+      "webhookId": "cdb3dd49-4d2a-4e9f-b921-11fe2dacbe26",
+      "credentials": {
+        "slackApi": {
+          "id": "vTyS7Howwaf2CqoY",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        208
+      ],
+      "id": "a15d59e3-4ada-418b-9cde-7dc8f713ecc9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rYzIV6Q0zSN2vZuq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.channel }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        208
+      ],
+      "id": "0d87970d-9887-4ec4-ab10-3564310919cc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.channel }}",
+          "mode": "id"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "sendAsUser": "Jacob"
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        0
+      ],
+      "id": "5ed06900-d13c-44f6-b763-5d9cd176db01",
+      "name": "Send a message",
+      "webhookId": "6bbc569b-3e24-4e04-a5cd-1856e531db57",
+      "credentials": {
+        "slackApi": {
+          "id": "vTyS7Howwaf2CqoY",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are Jacob, a social media manager at Purple Unicorn Marketing Agency. Respond to your members' message on Jacob's behalf on Slack. Sound friendly and natural in a typical tech working environment. \n\n##Tool\nUse the Google Doc Tool when asked about Project Updates"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "cdd11d82-b9bf-435e-8bb1-208737b8c74b",
+      "name": "GPT 5 Slack Agent"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "Doc ID"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        496,
+        208
+      ],
+      "id": "ff8177f8-c741-4900-adec-b6984d1da29b",
+      "name": "Project Knowledge Base",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "EYAPWUWhWgiTVVJY",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "GPT 5 Slack Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "GPT 5 Slack Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "GPT 5 Slack Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5 Slack Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Project Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "GPT 5 Slack Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a135bc64-d685-4ba6-b6e7-aec1df1ee8a5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "7MQLIwQsFOmnQV4n",
+  "tags": []
+}

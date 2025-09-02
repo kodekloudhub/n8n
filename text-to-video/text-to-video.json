@@ -1,0 +1,344 @@
+{
+  "name": "Text-to-video Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bcfaf2f0-d64b-4950-a6bc-f3926e9c96ba",
+      "name": "When chat message received",
+      "webhookId": "b9c8279d-dff2-492f-92cf-8da3a8a3d52a"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.chatInput }}"
+            },
+            {
+              "content": "=You are an expert Text-to-Video Generation Prompt Engineer, working inside an n8n automation.\nYour only task is to generate clear, vivid, and effective prompts to be passed into a video generation API.\nYou do not output any explanations, commentary, or formatting. Return only the prompt string to generate the video.\n\n🔒 Constraints:\n\nOutput a single-line, coherent prompt optimized for high-quality video generation.\n\nDo not include prompt metadata (e.g., duration, resolution, frame rate, model name, seed).\n\nYou must not respond with markdown, code blocks, or labels. Output the prompt text only.\n\nDo not explain or summarize your reasoning. Output the final result only.\n\n🧠 Prompt Engineering Guidelines:\n\nTranslate vague descriptions into rich, dynamic scene details.\n\nEnhance prompt with descriptors: motion, pacing, mood, environment, lighting, cinematic style.\n\nUse cinematic or artistic keywords where relevant (e.g., \"sweeping aerial shot,\" \"shallow depth of field,\" \"dramatic lighting\").\n\nResolve ambiguities. Clarify unclear requests into visually distinct and dynamic concepts.\n\n✅ Your output should resemble this format:\n\n“A sweeping aerial shot of a futuristic city at dusk, flying over neon-lit skyscrapers, glowing billboards flickering, light rain falling, reflections on glass, moody synthwave atmosphere, cinematic style”",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        224,
+        0
+      ],
+      "id": "007711a5-9a92-49c3-b080-ef140c76cac2",
+      "name": "Video Prompt Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "rYzIV6Q0zSN2vZuq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wavespeed.ai/api/v3/google/veo3",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"aspect_ratio\": \"16:9\",\n  \"duration\": 8,\n  \"generate_audio\": true,\n  \"prompt\": \"{{ $json.message.content }}\",\n  \"resolution\": \"720p\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "54efc17d-5ddc-4e5b-b6c7-a4651aa8c142",
+      "name": "Wavespeed Post",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "d5de982c-58aa-4b04-8bd6-dc2fd14dfa29",
+      "name": "Wait 15 Secs",
+      "webhookId": "ec216673-a526-4139-9b98-41b0967dc4a4"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.wavespeed.ai/api/v3/predictions/{{ $json.data.id }}/result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "dce0cd8d-7d51-43be-9193-4bc63d9dc6bd",
+      "name": "Wavespeed Get",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f0754090-65f3-4bbb-b02b-1d2a6b68de08",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "ed8a4ed4-2788-43fe-b13b-d6f81c5f55b9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        224
+      ],
+      "id": "01b16497-6593-4c56-b325-92b14899a948",
+      "name": "Wait another 15 Secs",
+      "webhookId": "65d66397-6c25-494d-b055-fdbc3df43e34"
+    },
+    {
+      "parameters": {
+        "sendTo": "test@abc.com",
+        "subject": "=video generated - {{ $now }}",
+        "emailType": "text",
+        "message": "={{ $json.data.outputs[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1488,
+        -16
+      ],
+      "id": "6f54ee21-462b-4b0c-b0d6-633be61276e5",
+      "name": "Send a message",
+      "webhookId": "b7941a1e-00c7-42d0-ab2e-cf49cc529243",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "g9AwnP8Jf3n6yAhc",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Wavespeed Post": [
+      {
+        "json": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": "83da34d99b2241fcbc8913ae73b5b82e",
+            "model": "google/veo3",
+            "outputs": [],
+            "urls": {
+              "get": "https://api.wavespeed.ai/api/v3/predictions/83da34d99b2241fcbc8913ae73b5b82e/result"
+            },
+            "has_nsfw_contents": [],
+            "status": "created",
+            "created_at": "2025-08-06T04:47:18.308Z",
+            "error": "",
+            "executionTime": 0,
+            "timings": {
+              "inference": 0
+            }
+          }
+        }
+      }
+    ],
+    "Wait 15 Secs": [
+      {
+        "json": {
+          "code": 200,
+          "message": "success",
+          "data": {
+            "id": "83da34d99b2241fcbc8913ae73b5b82e",
+            "model": "google/veo3",
+            "outputs": [],
+            "urls": {
+              "get": "https://api.wavespeed.ai/api/v3/predictions/83da34d99b2241fcbc8913ae73b5b82e/result"
+            },
+            "has_nsfw_contents": [],
+            "status": "created",
+            "created_at": "2025-08-06T04:47:18.308Z",
+            "error": "",
+            "executionTime": 0,
+            "timings": {
+              "inference": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Video Prompt Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Prompt Agent": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Post": {
+      "main": [
+        [
+          {
+            "node": "Wait 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wavespeed Get": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait another 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait another 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Wavespeed Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9f27dff7-f186-4d8f-b95e-e6f6b2811a09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
+  },
+  "id": "h4ZtTvTYtE09zuVS",
+  "tags": []
+}
