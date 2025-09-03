@@ -1,69 +1,45 @@
 {
-  "name": "Main Workflow Demo",
+  "name": "Subworkflow Demo",
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": [
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
             {
-              "mode": "everyMinute"
+              "content": "={{ $json.data.text }}"
+            },
+            {
+              "content": "=You are an assistant for video prompt and image-to-video generation.\n\nYour task is to:\n\n1. Create an effective Video Prompt to prompt a video generation model based on user's input\n\n2.Output only the following two values in JSON format:\nprompt: The text prompt for the video.\nimage_url: The URL of the image to generate the video from. Fetch this value from the last row of the attached Google Sheet Log tool.\nReturn only these two fields in your response, formatted as a JSON object.",
+              "role": "system"
             }
           ]
         },
-        "triggerOn": "specificFolder",
-        "folderToWatch": {
-          "__rl": true,
-          "value": "1ay52vzrhX4EpogpfP11-CaJEufyyckpz",
-          "mode": "list",
-          "cachedResultName": "Image to Video KodeKloud",
-          "cachedResultUrl": "https://drive.google.com/drive/folders/1ay52vzrhX4EpogpfP11-CaJEufyyckpz"
-        },
-        "event": "fileCreated",
+        "jsonOutput": true,
         "options": {}
       },
-      "type": "n8n-nodes-base.googleDriveTrigger",
-      "typeVersion": 1,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
       "position": [
-        -368,
-        -128
+        -2176,
+        -80
       ],
-      "id": "0a37182c-6b9c-4d88-bcba-8cbb8d2dbfb7",
-      "name": "Google Drive Trigger",
+      "id": "a6581fa8-3537-42ce-b9f6-e0f9e3e5a6ee",
+      "name": "Video Prompt Agent",
       "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "eRPFvrf6Z8fHQDkZ",
-          "name": "Google Drive account"
+        "openAiApi": {
+          "id": "rYzIV6Q0zSN2vZuq",
+          "name": "OpenAi account 2"
         }
       }
     },
     {
       "parameters": {
-        "operation": "sendPhoto",
-        "chatId": "888347235",
-        "file": "={{ $json.webContentLink }}",
-        "additionalFields": {
-          "caption": "=You've uploaded this photo to the G Folder"
-        }
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        -144,
-        -128
-      ],
-      "id": "e9e323ad-4fac-4b6a-9523-9c2ea906a220",
-      "name": "Telegram",
-      "webhookId": "ab27f2b6-55d9-4d8a-8d43-808e1a00169b",
-      "credentials": {
-        "telegramApi": {
-          "id": "HO4KjPSpXsYWKcMh",
-          "name": "Telegram Demo"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "append",
         "documentId": {
           "__rl": true,
           "value": "1y3z2z1NgGbr-1bkVvOyqcD4ZAz9K-kpk3biSqwSRpMY",
@@ -78,46 +54,16 @@
           "cachedResultName": "Sheet1",
           "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y3z2z1NgGbr-1bkVvOyqcD4ZAz9K-kpk3biSqwSRpMY/edit#gid=0"
         },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Image URL": "={{ $('Google Drive Trigger').item.json.webContentLink }}",
-            "Date": "={{ $now }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "Image URL",
-              "displayName": "Image URL",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Date",
-              "displayName": "Date",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
         "options": {}
       },
-      "type": "n8n-nodes-base.googleSheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.6,
       "position": [
-        64,
-        -128
+        -2128,
+        160
       ],
-      "id": "7d1240e4-0c9c-4e7f-afcf-69967e1a2e39",
-      "name": "Image Log",
+      "id": "5585ad79-d423-4a2c-bc8f-0a6b17b8b6a3",
+      "name": "Google Sheet Log",
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "iC7PDE8OXyZvXAo4",
@@ -127,191 +73,310 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "RZZCnAP6m6PqGOPf",
-          "mode": "list",
-          "cachedResultName": "Subworkflow Demo"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [
+        "method": "POST",
+        "url": "https://api.wavespeed.ai/api/v3/bytedance/seedance-v1-lite-i2v-720p",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
             {
-              "id": "Image URL",
-              "displayName": "Image URL",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
+              "name": "camera_fixed",
+              "value": "false"
+            },
+            {
+              "name": "duration",
+              "value": "5"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.message.content.image_url }}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.message.content.prompt }}"
+            },
+            {
+              "name": "seed",
+              "value": "-1"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1840,
+        -64
+      ],
+      "id": "dd843b39-1e9c-4748-80f4-85b816740c47",
+      "name": "Seedance Post",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1616,
+        -64
+      ],
+      "id": "867886fc-3168-4793-a6d7-eda91f25234f",
+      "name": "Wait 15 secs",
+      "webhookId": "b825d0b2-2411-43d6-96a5-1eb99414c4d6"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.wavespeed.ai/api/v3/predictions/{{ $json.data.id }}/result",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1456,
+        -64
+      ],
+      "id": "9a84a07e-5a91-4dbf-b8c0-de2ef5b67bba",
+      "name": "Seedance Get",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2PXgIPHYSU6jeNcu",
+          "name": "Wavespeed Credential Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c187d8bd-382f-4c1c-900d-bf38d4d708d4",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
             }
           ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
+          "combinator": "and"
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.executeWorkflow",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1280,
+        -64
+      ],
+      "id": "a41e66b8-0014-4746-bcdb-b34c8ebd636f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1280,
+        208
+      ],
+      "id": "f9dcd9fb-106e-4241-aa5c-5e0e55bfd5af",
+      "name": "Wait Another 15 Secs",
+      "webhookId": "9c915674-06bf-4b38-96f5-ccb831e2a1af"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "=888347235",
+        "file": "={{ $json.data.outputs[0] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        288,
-        -128
+        -1088,
+        -80
       ],
-      "id": "3121710d-ecbf-4a19-b3a3-79a7e4c28651",
-      "name": "Execute Workflow"
+      "id": "2518f8e0-cbe3-4660-9c6d-2aa0f80a8770",
+      "name": "Telegram Send A Video",
+      "webhookId": "f9982196-8bb9-4b20-895c-7600d25daeef",
+      "credentials": {
+        "telegramApi": {
+          "id": "HO4KjPSpXsYWKcMh",
+          "name": "Telegram Demo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Image URL"
+            },
+            {
+              "name": "Date"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2736,
+        -80
+      ],
+      "id": "ea77f1a0-0d4d-4298-b260-fcecdbbbf432",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "888347235",
+        "message": "Could you provide the video idea that you want to generate from this image?",
+        "responseType": "freeText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2448,
+        -80
+      ],
+      "id": "6976ce88-e7b6-4b74-b8c0-17bfb0344765",
+      "name": "Telegram",
+      "webhookId": "8043e4d5-b45a-4a39-8c2f-c69d1fe6cbaf",
+      "credentials": {
+        "telegramApi": {
+          "id": "HO4KjPSpXsYWKcMh",
+          "name": "Telegram Demo"
+        }
+      }
     }
   ],
   "pinData": {
-    "Google Drive Trigger": [
+    "When Executed by Another Workflow": [
       {
         "json": {
-          "parents": [
-            "1ay52vzrhX4EpogpfP11-CaJEufyyckpz"
-          ],
-          "lastModifyingUser": {
-            "displayName": "Marconi Darmawan",
-            "kind": "drive#user",
-            "me": true,
-            "permissionId": "14491281325317365533",
-            "emailAddress": "marconi@kodekloud.com",
-            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64"
-          },
-          "owners": [
-            {
-              "displayName": "Marconi Darmawan",
-              "kind": "drive#user",
-              "me": true,
-              "permissionId": "14491281325317365533",
-              "emailAddress": "marconi@kodekloud.com",
-              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64"
-            }
-          ],
-          "permissions": [
-            {
-              "kind": "drive#permission",
-              "id": "anyoneWithLink",
-              "type": "anyone",
-              "role": "reader",
-              "allowFileDiscovery": false
-            },
-            {
-              "kind": "drive#permission",
-              "id": "14491281325317365533",
-              "type": "user",
-              "emailAddress": "marconi@kodekloud.com",
-              "role": "owner",
-              "displayName": "Marconi Darmawan",
-              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJGAKYdVZb8SAvGKI3TKmkz7QhKk7ms-lZ2xXGIuFsqkqTMy8nc=s64",
-              "deleted": false,
-              "pendingOwner": false
-            }
-          ],
-          "spaces": [
-            "drive"
-          ],
-          "capabilities": {
-            "canAcceptOwnership": false,
-            "canAddChildren": false,
-            "canAddMyDriveParent": false,
-            "canChangeCopyRequiresWriterPermission": true,
-            "canChangeItemDownloadRestriction": true,
-            "canChangeSecurityUpdateEnabled": false,
-            "canChangeViewersCanCopyContent": true,
-            "canComment": true,
-            "canCopy": true,
-            "canDelete": true,
-            "canDisableInheritedPermissions": false,
-            "canDownload": true,
-            "canEdit": true,
-            "canEnableInheritedPermissions": true,
-            "canListChildren": false,
-            "canModifyContent": true,
-            "canModifyContentRestriction": true,
-            "canModifyEditorContentRestriction": true,
-            "canModifyOwnerContentRestriction": true,
-            "canModifyLabels": false,
-            "canMoveChildrenWithinDrive": false,
-            "canMoveItemIntoTeamDrive": true,
-            "canMoveItemOutOfDrive": true,
-            "canMoveItemWithinDrive": true,
-            "canReadLabels": false,
-            "canReadRevisions": true,
-            "canRemoveChildren": false,
-            "canRemoveContentRestriction": false,
-            "canRemoveMyDriveParent": true,
-            "canRename": true,
-            "canShare": true,
-            "canTrash": true,
-            "canUntrash": true
-          },
-          "permissionIds": [
-            "anyoneWithLink",
-            "14491281325317365533"
-          ],
-          "imageMediaMetadata": {
-            "width": 1024,
-            "height": 1322,
-            "rotation": 0
-          },
-          "linkShareMetadata": {
-            "securityUpdateEligible": false,
-            "securityUpdateEnabled": true
-          },
-          "downloadRestrictions": {
-            "itemDownloadRestriction": {
-              "restrictedForReaders": false,
-              "restrictedForWriters": false
-            },
-            "effectiveDownloadRestrictionWithContext": {
-              "restrictedForReaders": false,
-              "restrictedForWriters": false
-            }
-          },
-          "kind": "drive#file",
-          "id": "1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG",
-          "name": "1 (3).jpeg",
-          "mimeType": "image/jpeg",
-          "starred": false,
-          "trashed": false,
-          "explicitlyTrashed": false,
-          "version": "3",
-          "webContentLink": "https://drive.google.com/uc?id=1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG&export=download",
-          "webViewLink": "https://drive.google.com/file/d/1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG/view?usp=drivesdk",
-          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/image/jpeg",
-          "hasThumbnail": true,
-          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBMB9NlQiNKdNBppGAG2rXUB4CNS9ZOkq94FcIMBEmT9QohKIQnjiohXZWVCrbTnr7XOQ4sJu0-USnuv_SNoz1uw9HMuIiLLlyfuAs6nyDDbra8=s220",
-          "thumbnailVersion": "1",
-          "viewedByMe": true,
-          "viewedByMeTime": "2025-08-06T04:59:37.952Z",
-          "createdTime": "2025-08-06T04:59:37.952Z",
-          "modifiedTime": "2025-08-06T04:15:16.000Z",
-          "modifiedByMeTime": "2025-08-06T04:15:16.000Z",
-          "modifiedByMe": true,
-          "shared": true,
-          "ownedByMe": true,
-          "viewersCanCopyContent": true,
-          "copyRequiresWriterPermission": false,
-          "writersCanShare": true,
-          "originalFilename": "1 (3).jpeg",
-          "fullFileExtension": "jpeg",
-          "fileExtension": "jpeg",
-          "md5Checksum": "f4ed5bba0c45bd9fa1612c8f68fd010a",
-          "sha1Checksum": "c44fb5ab69ab0a10a606f290f4201e603e52588e",
-          "sha256Checksum": "a8746be62338eeea6b48068806e2678d4af7ec64e0bc997f34d9849318481102",
-          "size": "294811",
-          "quotaBytesUsed": "294811",
-          "headRevisionId": "0Bw89TXLU6fojZVR6ZTA1SHZvRSt2ZjNXRjVlYWtVRTRRUkxBPQ",
-          "isAppAuthorized": false,
-          "inheritedPermissionsDisabled": false
+          "Image URL": "https://drive.google.com/uc?id=1jeL_uT9Tt2FWBz6_bN-4AUbMTSu1tLBG&export=download",
+          "Date": "2025-08-07T14:33:16.718+08:00"
         }
       }
     ]
   },
   "connections": {
-    "Google Drive Trigger": {
+    "Video Prompt Agent": {
+      "main": [
+        [
+          {
+            "node": "Seedance Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheet Log": {
+      "ai_tool": [
+        [
+          {
+            "node": "Video Prompt Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seedance Post": {
+      "main": [
+        [
+          {
+            "node": "Wait 15 secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 secs": {
+      "main": [
+        [
+          {
+            "node": "Seedance Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seedance Get": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send A Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Another 15 Secs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Another 15 Secs": {
+      "main": [
+        [
+          {
+            "node": "Seedance Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
       "main": [
         [
           {
@@ -326,18 +391,7 @@
       "main": [
         [
           {
-            "node": "Image Log",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Image Log": {
-      "main": [
-        [
-          {
-            "node": "Execute Workflow",
+            "node": "Video Prompt Agent",
             "type": "main",
             "index": 0
           }
@@ -349,10 +403,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6bd10692-5980-43c1-94c9-b17f97ce5851",
+  "versionId": "d44c75ca-ec37-46f0-a38d-f6ed5dd259ec",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
   },
-  "id": "Hpqbed1TJ53mzvHM",
+  "id": "RZZCnAP6m6PqGOPf",
   "tags": []
 }
