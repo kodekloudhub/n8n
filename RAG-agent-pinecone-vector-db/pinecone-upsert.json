@@ -1,5 +1,5 @@
 {
-  "name": "My workflow 10",
+  "name": "Upload the Data to Vector DB",
   "nodes": [
     {
       "parameters": {
