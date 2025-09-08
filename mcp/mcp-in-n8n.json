@@ -1,5 +1,5 @@
 {
-  "name": "MCP Lab 7",
+  "name": "MCP Lab - End Result",
   "nodes": [
     {
       "parameters": {
@@ -64,6 +64,56 @@
       ],
       "id": "eb7795c0-4232-400d-9f1c-486e2f677dc6",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://marconi.app.n8n.cloud/mcp-test/ae880edf-38d9-4ec8-892d-6cb74f7ffe9b"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        208
+      ],
+      "id": "8d9e488f-65ff-4889-82bc-c510f0704cd6",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "path": "ae880edf-38d9-4ec8-892d-6cb74f7ffe9b"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        416
+      ],
+      "id": "b027a327-b2b5-4caa-941f-55135f5c3298",
+      "name": "MCP Server Trigger",
+      "webhookId": "ae880edf-38d9-4ec8-892d-6cb74f7ffe9b"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        592
+      ],
+      "id": "ef94a8d5-848a-4303-b6af-4d9c4be757a6",
+      "name": "Send a message in Gmail",
+      "webhookId": "e9aa92af-2cf4-4eb8-bb48-a5577b9ec900",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "g9AwnP8Jf3n6yAhc",
+          "name": "Gmail account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -100,13 +150,35 @@
           }
         ]
       ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "603cc85e-9595-4769-bf2c-83b2720246de",
+  "versionId": "061fdc73-90a3-4584-a859-7424f6d6a641",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "16d5a69b6a4f4733c8f669903729902650204c895b060993271b9227d7b0b3e8"
