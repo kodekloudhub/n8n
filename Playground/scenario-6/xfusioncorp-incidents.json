@@ -1,0 +1,5 @@
+[
+  {"incident_id":"INC-2025-001","priority":"P1","region":"NCR","site_id":"SITE-MNL-001","opened_at":"2025-01-15T08:30:00Z","resolved_at":"2025-01-15T14:00:00Z","sla_hours":4,"category":"NETWORK"},
+  {"incident_id":"INC-2025-002","priority":"P2","region":"Visayas","site_id":"SITE-CEB-010","opened_at":"2025-01-15T10:00:00Z","resolved_at":"2025-01-16T09:00:00Z","sla_hours":8,"category":"BILLING"},
+  {"incident_id":"INC-2025-003","priority":"P1","region":"Mindanao","site_id":"SITE-CDO-005","opened_at":"2025-01-15T06:00:00Z","resolved_at":null,"sla_hours":4,"category":"NETWORK"}
+]

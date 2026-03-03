@@ -1,0 +1,5 @@
+[
+  {"alarm_id":"ALM-001","site_id":"SITE-MNL-001","alarm_type":"Power Failure","severity":"CRITICAL","triggered_at":"2025-01-15T08:25:00Z"},
+  {"alarm_id":"ALM-002","site_id":"SITE-CEB-010","alarm_type":"High Latency","severity":"WARNING","triggered_at":"2025-01-15T09:55:00Z"},
+  {"alarm_id":"ALM-003","site_id":"SITE-CDO-005","alarm_type":"Link Down","severity":"CRITICAL","triggered_at":"2025-01-15T05:50:00Z"}
+]
