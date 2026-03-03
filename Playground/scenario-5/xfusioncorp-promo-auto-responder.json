@@ -5,40 +5,19 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -624,
-        272
-      ],
-      "id": "62f274dc-10d1-41ae-adf3-4cea75995bf7",
+      "position": [-112, -144],
+      "id": "8119cbb6-e601-44a4-898e-983784229f61",
       "name": "Manual Trigger"
     },
     {
       "parameters": {
-        "fileSelector": "/root/.n8n-files/xfusioncorp-promo-campaigns.json",
-        "options": {}
+        "jsCode": "const fs = require('fs');\nconst raw = fs.readFileSync('/root/.n8n-files/xfusioncorp-promo-campaigns.json', 'utf8');\nconst campaigns = JSON.parse(raw);\nreturn campaigns.map(c => ({ json: c }));"
       },
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [
-        -416,
-        272
-      ],
-      "id": "89d72e1a-f005-479e-b114-21bdc1b8544f",
-      "name": "Read Campaign Data"
-    },
-    {
-      "parameters": {
-        "operation": "fromJson",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.extractFromFile",
-      "typeVersion": 1,
-      "position": [
-        -192,
-        272
-      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [112, -144],
       "id": "f6ca5569-4d51-4feb-8528-568a3b2b531f",
-      "name": "Extract From File"
+      "name": "Load Campaign Data"
     },
     {
       "parameters": {
@@ -50,11 +29,8 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2,
-      "position": [
-        32,
-        272
-      ],
-      "id": "530e91e7-c5bd-45a8-838e-1b7dd642e592",
+      "position": [336, -144],
+      "id": "0c01d676-5106-4142-818f-57f7ac441c2c",
       "name": "AI Agent"
     },
     {
@@ -69,11 +45,8 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [
-        -32,
-        480
-      ],
-      "id": "ceaaa63b-e4ff-43a3-9af3-9f84b7675cad",
+      "position": [272, 64],
+      "id": "a5cc8306-31f1-424f-a177-d62a3d9e0a6a",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -89,25 +62,14 @@
       "main": [
         [
           {
-            "node": "Read Campaign Data",
+            "node": "Load Campaign Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Read Campaign Data": {
-      "main": [
-        [
-          {
-            "node": "Extract From File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract From File": {
+    "Load Campaign Data": {
       "main": [
         [
           {
