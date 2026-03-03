@@ -23,7 +23,7 @@
     {
       "parameters": {
         "operation": "read",
-        "fileSelector": "/root/mock-data/xfusioncorp-subscriber-report.csv"
+        "fileSelector": "/root/.n8n-files/xfusioncorp-subscriber-report.csv"
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,

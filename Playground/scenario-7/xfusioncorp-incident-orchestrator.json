@@ -21,7 +21,7 @@
     {
       "parameters": {
         "operation": "read",
-        "fileSelector": "/root/mock-data/xfusioncorp-network-kpis.csv"
+        "fileSelector": "/root/.n8n-files/xfusioncorp-network-kpis.csv"
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
