@@ -54,14 +54,6 @@
       "position": [320, 200],
       "id": "d1b2c3d4-4001-4000-d001-000000000004",
       "name": "Simple Memory"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [560, 0],
-      "id": "d1b2c3d4-4001-4000-d001-000000000005",
-      "name": "No Operation, do nothing"
     }
   ],
   "connections": {
@@ -70,17 +62,6 @@
         [
           {
             "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
