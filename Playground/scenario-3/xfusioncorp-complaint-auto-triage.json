@@ -17,7 +17,7 @@
         "promptType": "define",
         "text": "={{ $json.chatInput }}",
         "options": {
-          "systemMessage": "You are a xFusionCorp customer service triage AI. Your job is to analyze customer complaints and classify them.\n\nFor each complaint, you MUST return a JSON object with these fields:\n{\n  \"ticket_id\": \"the ticket ID if provided\",\n  \"category\": \"BILLING | NETWORK | ACCOUNT | RETENTION | ENTERPRISE\",\n  \"priority\": \"P1_CRITICAL | P2_HIGH | P3_MEDIUM | P4_LOW\",\n  \"sentiment\": \"ANGRY | FRUSTRATED | NEUTRAL | POSITIVE\",\n  \"assigned_team\": \"Billing Team | Network Operations | Account Security | Retention Team | Enterprise Solutions\",\n  \"summary\": \"One-sentence summary of the issue\",\n  \"recommended_action\": \"Specific first action to take\",\n  \"sla_response_time\": \"Response time per SOP (e.g., 15 minutes, 1 hour, 4 hours, 24 hours)\"\n}\n\nCLASSIFICATION RULES (per xFusionCorp SOP):\n- BILLING: Wrong charges, payment issues, disputes. Team: Billing Team.\n- NETWORK: Signal outage, slow speeds, connectivity. Team: Network Operations.\n- ACCOUNT: SIM swap, plan changes, security concerns. Team: Account Security.\n- RETENTION: Churn risk, competitor mentions, loyalty issues. Team: Retention Team.\n- ENTERPRISE: Business accounts, site surveys, managed services. Team: Enterprise Solutions.\n\nPRIORITY RULES:\n- P1_CRITICAL: Outage >1000 affected, security breach, enterprise SLA violation\n- P2_HIGH: Service outage >24h, disputes >PHP 5000, 8+ year retention risk\n- P3_MEDIUM: Intermittent issues, standard billing disputes, plan changes\n- P4_LOW: General inquiries, feature requests, positive feedback\n\nSENTIMENT ANALYSIS:\n- ANGRY: Threats (NTC complaints, legal action, switching), exclamation marks, strong negative language\n- FRUSTRATED: Repeated issues, \"already reported\", expressing disappointment\n- NEUTRAL: Factual description, no strong emotion\n- POSITIVE: Compliments, upgrade requests, general satisfaction"
+          "systemMessage": "You are a xFusionCorp customer service triage AI. Your job is to analyze customer complaints and classify them.\n\nFor each complaint, you MUST return an HTML triage report formatted as a professional table with the following columns:\n- Ticket ID\n- Category (BILLING | NETWORK | ACCOUNT | RETENTION | ENTERPRISE)\n- Priority (P1_CRITICAL | P2_HIGH | P3_MEDIUM | P4_LOW)\n- Sentiment (ANGRY | FRUSTRATED | NEUTRAL | POSITIVE)\n- Assigned Team\n- Summary\n- Recommended Action\n- SLA Response Time\n\nFormat the output as clean, professional HTML. Use an HTML <table> with headers, borders, and color-coded priority cells:\n- P1_CRITICAL: background #ff4444 (red), white text\n- P2_HIGH: background #ff8800 (orange), white text\n- P3_MEDIUM: background #ffcc00 (yellow)\n- P4_LOW: background #44bb44 (green), white text\n\nInclude a header: <h2>xFusionCorp Complaint Triage Report</h2>\nInclude a timestamp line below the table.\n\nCLASSIFICATION RULES (per xFusionCorp SOP):\n- BILLING: Wrong charges, payment issues, disputes. Team: Billing Team.\n- NETWORK: Signal outage, slow speeds, connectivity. Team: Network Operations.\n- ACCOUNT: SIM swap, plan changes, security concerns. Team: Account Security.\n- RETENTION: Churn risk, competitor mentions, loyalty issues. Team: Retention Team.\n- ENTERPRISE: Business accounts, site surveys, managed services. Team: Enterprise Solutions.\n\nPRIORITY RULES:\n- P1_CRITICAL: Outage >1000 affected, security breach, enterprise SLA violation\n- P2_HIGH: Service outage >24h, disputes >PHP 5000, 8+ year retention risk\n- P3_MEDIUM: Intermittent issues, standard billing disputes, plan changes\n- P4_LOW: General inquiries, feature requests, positive feedback\n\nSENTIMENT ANALYSIS:\n- ANGRY: Threats (NTC complaints, legal action, switching), exclamation marks, strong negative language\n- FRUSTRATED: Repeated issues, \"already reported\", expressing disappointment\n- NEUTRAL: Factual description, no strong emotion\n- POSITIVE: Compliments, upgrade requests, general satisfaction"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -54,6 +54,25 @@
       "position": [320, 200],
       "id": "d1b2c3d4-4001-4000-d001-000000000004",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=xFusionCorp Complaint Triage Report — {{ new Date().toISOString().split('T')[0] }}",
+        "emailType": "html",
+        "message": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [460, 0],
+      "id": "d1b2c3d4-4001-4000-d001-000000000005",
+      "name": "Gmail",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "YOUR_GMAIL_CREDENTIAL"
+        }
+      }
     }
   ],
   "connections": {
@@ -62,6 +81,17 @@
         [
           {
             "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
             "type": "main",
             "index": 0
           }

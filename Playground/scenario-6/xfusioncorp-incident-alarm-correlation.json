@@ -1,0 +1,227 @@
+{
+  "name": "xFusionCorp Incident & Alarm Correlation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-600, 200],
+      "id": "a1b2c3d4-6001-4000-a001-000000000001",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=[\n  {\"incident_id\":\"INC-2025-001\",\"priority\":\"P1\",\"region\":\"NCR\",\"site_id\":\"SITE-MNL-001\",\"opened_at\":\"2025-01-15T08:30:00Z\",\"resolved_at\":\"2025-01-15T14:00:00Z\",\"sla_hours\":4,\"category\":\"NETWORK\"},\n  {\"incident_id\":\"INC-2025-002\",\"priority\":\"P2\",\"region\":\"Visayas\",\"site_id\":\"SITE-CEB-010\",\"opened_at\":\"2025-01-15T10:00:00Z\",\"resolved_at\":\"2025-01-16T09:00:00Z\",\"sla_hours\":8,\"category\":\"BILLING\"},\n  {\"incident_id\":\"INC-2025-003\",\"priority\":\"P1\",\"region\":\"Mindanao\",\"site_id\":\"SITE-CDO-005\",\"opened_at\":\"2025-01-15T06:00:00Z\",\"resolved_at\":null,\"sla_hours\":4,\"category\":\"NETWORK\"}\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-360, 100],
+      "id": "a1b2c3d4-6001-4000-a001-000000000002",
+      "name": "Load Incidents"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=[\n  {\"alarm_id\":\"ALM-001\",\"site_id\":\"SITE-MNL-001\",\"alarm_type\":\"Power Failure\",\"severity\":\"CRITICAL\",\"triggered_at\":\"2025-01-15T08:25:00Z\"},\n  {\"alarm_id\":\"ALM-002\",\"site_id\":\"SITE-CEB-010\",\"alarm_type\":\"High Latency\",\"severity\":\"WARNING\",\"triggered_at\":\"2025-01-15T09:55:00Z\"},\n  {\"alarm_id\":\"ALM-003\",\"site_id\":\"SITE-CDO-005\",\"alarm_type\":\"Link Down\",\"severity\":\"CRITICAL\",\"triggered_at\":\"2025-01-15T05:50:00Z\"}\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-360, 300],
+      "id": "a1b2c3d4-6001-4000-a001-000000000003",
+      "name": "Load Alarms"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByFields",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "site_id",
+              "field2": "site_id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [-100, 200],
+      "id": "a1b2c3d4-6001-4000-a001-000000000004",
+      "name": "Merge by Site ID"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date('2025-01-15T15:00:00Z');\n\nfor (const item of items) {\n  const opened = new Date(item.json.opened_at);\n  const resolved = item.json.resolved_at ? new Date(item.json.resolved_at) : now;\n  const hoursElapsed = Math.round((resolved - opened) / (1000 * 60 * 60) * 10) / 10;\n  const slaBreach = hoursElapsed > item.json.sla_hours;\n\n  item.json.hours_elapsed = hoursElapsed;\n  item.json.sla_breached = slaBreach;\n  item.json.status = item.json.resolved_at ? 'RESOLVED' : 'OPEN';\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [140, 200],
+      "id": "a1b2c3d4-6001-4000-a001-000000000005",
+      "name": "Calculate SLA Breach"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "P1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "condition-2",
+              "leftValue": "={{ $json.sla_breached }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [380, 200],
+      "id": "a1b2c3d4-6001-4000-a001-000000000006",
+      "name": "Is Critical or Breached?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst rows = items.map(item => {\n  const d = item.json;\n  const rowColor = d.sla_breached ? '#ffe0e0' : (d.priority === 'P1' ? '#fff3e0' : '#e8f5e9');\n  const statusBadge = d.status === 'OPEN'\n    ? '<span style=\"color:#fff;background:#ff4444;padding:2px 8px;border-radius:4px;\">OPEN</span>'\n    : '<span style=\"color:#fff;background:#44bb44;padding:2px 8px;border-radius:4px;\">RESOLVED</span>';\n  const slaBadge = d.sla_breached\n    ? '<span style=\"color:#fff;background:#ff4444;padding:2px 8px;border-radius:4px;\">BREACHED</span>'\n    : '<span style=\"color:#fff;background:#44bb44;padding:2px 8px;border-radius:4px;\">OK</span>';\n\n  return `<tr style=\"background:${rowColor}\">\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.incident_id}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.site_id}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.region}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.priority}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.category}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.alarm_type} (${d.severity})</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${statusBadge}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.hours_elapsed}h / ${d.sla_hours}h</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${slaBadge}</td>\n  </tr>`;\n}).join('');\n\nconst html = `\n<div style=\"font-family:Arial,sans-serif;max-width:900px;margin:0 auto;\">\n  <h2 style=\"color:#1a237e;\">xFusionCorp Daily Incident &amp; Alarm Correlation Report</h2>\n  <p style=\"color:#555;\">Generated: ${new Date().toISOString().split('T')[0]} | Flagged Items: ${items.length} (P1 or SLA Breached)</p>\n  <table style=\"border-collapse:collapse;width:100%;font-size:13px;\">\n    <thead>\n      <tr style=\"background:#1a237e;color:#fff;\">\n        <th style=\"padding:8px;border:1px solid #ddd;\">Incident ID</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Site ID</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Region</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Priority</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Category</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Alarm</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Status</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Elapsed / SLA</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">SLA Status</th>\n      </tr>\n    </thead>\n    <tbody>${rows}</tbody>\n  </table>\n  <hr style=\"margin:20px 0;\">\n  <p style=\"font-size:12px;color:#888;\">This is an automated report from xFusionCorp Network Operations. Items shown are P1 priority or have breached SLA targets.</p>\n</div>`;\n\nreturn [{ json: { html } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 100],
+      "id": "a1b2c3d4-6001-4000-a001-000000000007",
+      "name": "Generate Report"
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=xFusionCorp Incident & Alarm Correlation Report — {{ new Date().toISOString().split('T')[0] }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [860, 100],
+      "id": "a1b2c3d4-6001-4000-a001-000000000008",
+      "name": "Gmail",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "YOUR_GMAIL_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Incidents",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Load Alarms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Incidents": {
+      "main": [
+        [
+          {
+            "node": "Merge by Site ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Alarms": {
+      "main": [
+        [
+          {
+            "node": "Merge by Site ID",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge by Site ID": {
+      "main": [
+        [
+          {
+            "node": "Calculate SLA Breach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate SLA Breach": {
+      "main": [
+        [
+          {
+            "node": "Is Critical or Breached?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Critical or Breached?": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}
