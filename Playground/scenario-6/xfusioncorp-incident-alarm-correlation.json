@@ -11,27 +11,47 @@
     },
     {
       "parameters": {
-        "mode": "raw",
-        "jsonOutput": "=[\n  {\"incident_id\":\"INC-2025-001\",\"priority\":\"P1\",\"region\":\"NCR\",\"site_id\":\"SITE-MNL-001\",\"opened_at\":\"2025-01-15T08:30:00Z\",\"resolved_at\":\"2025-01-15T14:00:00Z\",\"sla_hours\":4,\"category\":\"NETWORK\"},\n  {\"incident_id\":\"INC-2025-002\",\"priority\":\"P2\",\"region\":\"Visayas\",\"site_id\":\"SITE-CEB-010\",\"opened_at\":\"2025-01-15T10:00:00Z\",\"resolved_at\":\"2025-01-16T09:00:00Z\",\"sla_hours\":8,\"category\":\"BILLING\"},\n  {\"incident_id\":\"INC-2025-003\",\"priority\":\"P1\",\"region\":\"Mindanao\",\"site_id\":\"SITE-CDO-005\",\"opened_at\":\"2025-01-15T06:00:00Z\",\"resolved_at\":null,\"sla_hours\":4,\"category\":\"NETWORK\"}\n]",
+        "fileSelector": "/root/.n8n-files/xfusioncorp-incidents.json",
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
       "position": [-360, 100],
       "id": "a1b2c3d4-6001-4000-a001-000000000002",
-      "name": "Load Incidents"
+      "name": "Read Incidents"
     },
     {
       "parameters": {
-        "mode": "raw",
-        "jsonOutput": "=[\n  {\"alarm_id\":\"ALM-001\",\"site_id\":\"SITE-MNL-001\",\"alarm_type\":\"Power Failure\",\"severity\":\"CRITICAL\",\"triggered_at\":\"2025-01-15T08:25:00Z\"},\n  {\"alarm_id\":\"ALM-002\",\"site_id\":\"SITE-CEB-010\",\"alarm_type\":\"High Latency\",\"severity\":\"WARNING\",\"triggered_at\":\"2025-01-15T09:55:00Z\"},\n  {\"alarm_id\":\"ALM-003\",\"site_id\":\"SITE-CDO-005\",\"alarm_type\":\"Link Down\",\"severity\":\"CRITICAL\",\"triggered_at\":\"2025-01-15T05:50:00Z\"}\n]",
+        "operation": "fromJson",
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [-140, 100],
+      "id": "a1b2c3d4-6001-4000-a001-00000000000b",
+      "name": "Parse Incidents"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/root/.n8n-files/xfusioncorp-alarms.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
       "position": [-360, 300],
       "id": "a1b2c3d4-6001-4000-a001-000000000003",
-      "name": "Load Alarms"
+      "name": "Read Alarms"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [-140, 300],
+      "id": "a1b2c3d4-6001-4000-a001-00000000000c",
+      "name": "Parse Alarms"
     },
     {
       "parameters": {
@@ -49,7 +69,7 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
-      "position": [-100, 200],
+      "position": [100, 200],
       "id": "a1b2c3d4-6001-4000-a001-000000000004",
       "name": "Merge by Site ID"
     },
@@ -59,7 +79,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [140, 200],
+      "position": [340, 200],
       "id": "a1b2c3d4-6001-4000-a001-000000000005",
       "name": "Calculate SLA Breach"
     },
@@ -98,7 +118,7 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [380, 200],
+      "position": [580, 200],
       "id": "a1b2c3d4-6001-4000-a001-000000000006",
       "name": "Is Critical or Breached?"
     },
@@ -108,7 +128,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [620, 100],
+      "position": [820, 100],
       "id": "a1b2c3d4-6001-4000-a001-000000000007",
       "name": "Generate Report"
     },
@@ -121,7 +141,7 @@
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [860, 100],
+      "position": [1060, 100],
       "id": "a1b2c3d4-6001-4000-a001-000000000008",
       "name": "Gmail",
       "credentials": {
@@ -137,19 +157,30 @@
       "main": [
         [
           {
-            "node": "Load Incidents",
+            "node": "Read Incidents",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Load Alarms",
+            "node": "Read Alarms",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Load Incidents": {
+    "Read Incidents": {
+      "main": [
+        [
+          {
+            "node": "Parse Incidents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Incidents": {
       "main": [
         [
           {
@@ -160,7 +191,18 @@
         ]
       ]
     },
-    "Load Alarms": {
+    "Read Alarms": {
+      "main": [
+        [
+          {
+            "node": "Parse Alarms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Alarms": {
       "main": [
         [
           {
