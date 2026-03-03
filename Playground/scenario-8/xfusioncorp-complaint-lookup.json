@@ -12,7 +12,7 @@
     {
       "parameters": {
         "operation": "read",
-        "fileSelector": "Playground/scenario-8/xfusioncorp-customer-complaints.json"
+        "fileSelector": "/root/mock-data/xfusioncorp-customer-complaints.json"
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,

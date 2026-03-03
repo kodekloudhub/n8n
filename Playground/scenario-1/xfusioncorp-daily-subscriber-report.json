@@ -23,7 +23,7 @@
     {
       "parameters": {
         "operation": "read",
-        "fileSelector": "Playground/scenario-1/xfusioncorp-subscriber-report.csv"
+        "fileSelector": "/root/mock-data/xfusioncorp-subscriber-report.csv"
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
@@ -76,14 +76,13 @@
     },
     {
       "parameters": {
-        "fromEmail": "reports@xfusioncorp.com",
-        "toEmail": "your-email@example.com",
+        "sendTo": "your-email@example.com",
         "subject": "=xFusionCorp Daily Subscriber Report — {{ new Date().toISOString().split('T')[0] }}",
-        "emailFormat": "html",
-        "html": "={{ $json.text }}"
+        "emailType": "html",
+        "message": "={{ $json.text }}"
       },
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.2,
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
       "position": [880, 0],
       "id": "a1b2c3d4-1001-4000-a001-000000000006",
       "name": "Send Email Report"
