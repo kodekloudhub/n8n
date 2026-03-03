@@ -55,7 +55,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const incidents = $('Parse Incidents').all().map(i => i.json);\nconst alarms = $input.all().map(i => i.json);\nconst now = new Date('2025-01-15T15:00:00Z');\n\nconst merged = incidents.map(inc => {\n  const alarm = alarms.find(a => a.site_id === inc.site_id);\n  const opened = new Date(inc.opened_at);\n  const resolved = inc.resolved_at ? new Date(inc.resolved_at) : now;\n  const hoursElapsed = Math.round((resolved - opened) / (1000 * 60 * 60) * 10) / 10;\n  const slaBreach = hoursElapsed > inc.sla_hours;\n\n  return {\n    json: {\n      ...inc,\n      alarm_id: alarm ? alarm.alarm_id : null,\n      alarm_type: alarm ? alarm.alarm_type : 'N/A',\n      severity: alarm ? alarm.severity : 'N/A',\n      triggered_at: alarm ? alarm.triggered_at : null,\n      hours_elapsed: hoursElapsed,\n      sla_breached: slaBreach,\n      status: inc.resolved_at ? 'RESOLVED' : 'OPEN'\n    }\n  };\n});\n\nreturn merged;"
+        "jsCode": "const incidents = $('Parse Incidents').all().map(i => i.json);\nconst alarms = $input.all().map(i => i.json);\nconst now = new Date('2025-01-15T15:00:00Z');\n\nconst merged = incidents.map(inc => {\n  const alarm = alarms.find(a => a.site_id === inc.site_id);\n  const opened = new Date(inc.opened_at);\n  const resolved = inc.resolved_at ? new Date(inc.resolved_at) : now;\n  const hoursElapsed = Math.round((resolved - opened) / (1000 * 60 * 60) * 10) / 10;\n  const slaBreach = hoursElapsed > inc.sla_hours;\n\n  return {\n    json: {\n      ...inc,\n      alarm_id: alarm ? alarm.alarm_id : null,\n      alarm_type: alarm ? alarm.alarm_type : 'N/A',\n      severity: alarm ? alarm.severity : 'N/A',\n      triggered_at: alarm ? alarm.triggered_at : null,\n      hours_elapsed: hoursElapsed,\n      sla_breached: slaBreach,\n      status: inc.resolved_at ? 'RESOLVED' : 'OPEN'\n    }\n  };\n});\n\n// Filter: only keep P1 incidents or those that breached SLA\nconst flagged = merged.filter(item =>\n  item.json.priority === 'P1' || item.json.sla_breached === true\n);\n\nreturn flagged;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -65,50 +65,11 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "condition-1",
-              "leftValue": "={{ $json.priority }}",
-              "rightValue": "P1",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            },
-            {
-              "id": "condition-2",
-              "leftValue": "={{ $json.sla_breached }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "or"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [380, 300],
-      "id": "a1b2c3d4-6001-4000-a001-000000000006",
-      "name": "Is Critical or Breached?"
-    },
-    {
-      "parameters": {
         "jsCode": "const items = $input.all();\nconst rows = items.map(item => {\n  const d = item.json;\n  const rowColor = d.sla_breached ? '#ffe0e0' : (d.priority === 'P1' ? '#fff3e0' : '#e8f5e9');\n  const statusBadge = d.status === 'OPEN'\n    ? '<span style=\"color:#fff;background:#ff4444;padding:2px 8px;border-radius:4px;\">OPEN</span>'\n    : '<span style=\"color:#fff;background:#44bb44;padding:2px 8px;border-radius:4px;\">RESOLVED</span>';\n  const slaBadge = d.sla_breached\n    ? '<span style=\"color:#fff;background:#ff4444;padding:2px 8px;border-radius:4px;\">BREACHED</span>'\n    : '<span style=\"color:#fff;background:#44bb44;padding:2px 8px;border-radius:4px;\">OK</span>';\n\n  return `<tr style=\"background:${rowColor}\">\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.incident_id}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.site_id}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.region}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.priority}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.category}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.alarm_type} (${d.severity})</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${statusBadge}</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${d.hours_elapsed}h / ${d.sla_hours}h</td>\n    <td style=\"padding:8px;border:1px solid #ddd;\">${slaBadge}</td>\n  </tr>`;\n}).join('');\n\nconst html = `\n<div style=\"font-family:Arial,sans-serif;max-width:900px;margin:0 auto;\">\n  <h2 style=\"color:#1a237e;\">xFusionCorp Daily Incident &amp; Alarm Correlation Report</h2>\n  <p style=\"color:#555;\">Generated: ${new Date().toISOString().split('T')[0]} | Flagged Items: ${items.length} (P1 or SLA Breached)</p>\n  <table style=\"border-collapse:collapse;width:100%;font-size:13px;\">\n    <thead>\n      <tr style=\"background:#1a237e;color:#fff;\">\n        <th style=\"padding:8px;border:1px solid #ddd;\">Incident ID</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Site ID</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Region</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Priority</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Category</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Alarm</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Status</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">Elapsed / SLA</th>\n        <th style=\"padding:8px;border:1px solid #ddd;\">SLA Status</th>\n      </tr>\n    </thead>\n    <tbody>${rows}</tbody>\n  </table>\n  <hr style=\"margin:20px 0;\">\n  <p style=\"font-size:12px;color:#888;\">This is an automated report from xFusionCorp Network Operations. Items shown are P1 priority or have breached SLA targets.</p>\n</div>`;\n\nreturn [{ json: { html } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [620, 200],
+      "position": [420, 300],
       "id": "a1b2c3d4-6001-4000-a001-000000000007",
       "name": "Generate Report"
     },
@@ -121,7 +82,7 @@
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [860, 200],
+      "position": [660, 300],
       "id": "a1b2c3d4-6001-4000-a001-000000000008",
       "name": "Gmail",
       "credentials": {
@@ -183,17 +144,6 @@
       ]
     },
     "Correlate & Calculate SLA": {
-      "main": [
-        [
-          {
-            "node": "Is Critical or Breached?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Critical or Breached?": {
       "main": [
         [
           {
