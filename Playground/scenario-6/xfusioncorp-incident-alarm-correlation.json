@@ -55,33 +55,23 @@
     },
     {
       "parameters": {
-        "mode": "combine",
-        "combinationMode": "mergeByFields",
-        "mergeByFields": {
-          "values": [
-            {
-              "field1": "site_id",
-              "field2": "site_id"
-            }
-          ]
-        },
-        "options": {}
+        "mode": "append"
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [100, 200],
       "id": "a1b2c3d4-6001-4000-a001-000000000004",
-      "name": "Merge by Site ID"
+      "name": "Combine Data"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst now = new Date('2025-01-15T15:00:00Z');\n\nfor (const item of items) {\n  const opened = new Date(item.json.opened_at);\n  const resolved = item.json.resolved_at ? new Date(item.json.resolved_at) : now;\n  const hoursElapsed = Math.round((resolved - opened) / (1000 * 60 * 60) * 10) / 10;\n  const slaBreach = hoursElapsed > item.json.sla_hours;\n\n  item.json.hours_elapsed = hoursElapsed;\n  item.json.sla_breached = slaBreach;\n  item.json.status = item.json.resolved_at ? 'RESOLVED' : 'OPEN';\n}\n\nreturn items;"
+        "jsCode": "const all = $input.all().map(i => i.json);\nconst incidents = all.filter(r => r.incident_id);\nconst alarms = all.filter(r => r.alarm_id);\nconst now = new Date('2025-01-15T15:00:00Z');\n\nconst merged = incidents.map(inc => {\n  const alarm = alarms.find(a => a.site_id === inc.site_id);\n  const opened = new Date(inc.opened_at);\n  const resolved = inc.resolved_at ? new Date(inc.resolved_at) : now;\n  const hoursElapsed = Math.round((resolved - opened) / (1000 * 60 * 60) * 10) / 10;\n  const slaBreach = hoursElapsed > inc.sla_hours;\n\n  return {\n    json: {\n      ...inc,\n      alarm_id: alarm ? alarm.alarm_id : null,\n      alarm_type: alarm ? alarm.alarm_type : 'N/A',\n      severity: alarm ? alarm.severity : 'N/A',\n      triggered_at: alarm ? alarm.triggered_at : null,\n      hours_elapsed: hoursElapsed,\n      sla_breached: slaBreach,\n      status: inc.resolved_at ? 'RESOLVED' : 'OPEN'\n    }\n  };\n});\n\nreturn merged;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [340, 200],
       "id": "a1b2c3d4-6001-4000-a001-000000000005",
-      "name": "Calculate SLA Breach"
+      "name": "Correlate & Calculate SLA"
     },
     {
       "parameters": {
@@ -184,7 +174,7 @@
       "main": [
         [
           {
-            "node": "Merge by Site ID",
+            "node": "Combine Data",
             "type": "main",
             "index": 0
           }
@@ -206,25 +196,25 @@
       "main": [
         [
           {
-            "node": "Merge by Site ID",
+            "node": "Combine Data",
             "type": "main",
             "index": 1
           }
         ]
       ]
     },
-    "Merge by Site ID": {
+    "Combine Data": {
       "main": [
         [
           {
-            "node": "Calculate SLA Breach",
+            "node": "Correlate & Calculate SLA",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Calculate SLA Breach": {
+    "Correlate & Calculate SLA": {
       "main": [
         [
           {
