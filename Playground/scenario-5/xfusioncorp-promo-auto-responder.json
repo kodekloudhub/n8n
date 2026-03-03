@@ -64,22 +64,6 @@
           "name": "YOUR_OPENAIAPI_CREDENTIAL"
         }
       }
-    },
-    {
-      "parameters": {},
-      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "typeVersion": 1.3,
-      "position": [760, 200],
-      "id": "f1b2c3d4-6001-4000-f001-000000000006",
-      "name": "Simple Memory"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [880, 0],
-      "id": "f1b2c3d4-6001-4000-f001-000000000007",
-      "name": "No Operation, do nothing"
     }
   ],
   "connections": {
@@ -116,34 +100,12 @@
         ]
       ]
     },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "No Operation, do nothing",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "OpenAI Chat Model": {
       "ai_languageModel": [
         [
           {
             "node": "AI Agent",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Simple Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
             "index": 0
           }
         ]
