@@ -5,19 +5,30 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [-112, -144],
+      "position": [-336, -144],
       "id": "8119cbb6-e601-44a4-898e-983784229f61",
       "name": "Manual Trigger"
     },
     {
       "parameters": {
-        "jsCode": "const fs = require('fs');\nconst raw = fs.readFileSync('/root/.n8n-files/xfusioncorp-promo-campaigns.json', 'utf8');\nconst campaigns = JSON.parse(raw);\nreturn campaigns.map(c => ({ json: c }));"
+        "fileSelector": "/root/.n8n-files/xfusioncorp-promo-campaigns.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [-112, -144],
+      "id": "4ecb6415-3d28-4241-98c8-987e95b80141",
+      "name": "Read Campaign Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst binaryKey = Object.keys(items[0].binary)[0];\nconst base64Data = items[0].binary[binaryKey].data;\nconst jsonString = Buffer.from(base64Data, 'base64').toString('utf-8');\nconst campaigns = JSON.parse(jsonString);\nreturn campaigns.map(c => ({ json: c }));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [112, -144],
       "id": "f6ca5569-4d51-4feb-8528-568a3b2b531f",
-      "name": "Load Campaign Data"
+      "name": "Parse JSON"
     },
     {
       "parameters": {
@@ -62,14 +73,25 @@
       "main": [
         [
           {
-            "node": "Load Campaign Data",
+            "node": "Read Campaign Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Load Campaign Data": {
+    "Read Campaign Data": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON": {
       "main": [
         [
           {
