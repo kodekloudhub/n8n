@@ -94,7 +94,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You are a xFusionCorp Network Operations Center (NOC) analyst. A CRITICAL alarm has been detected. Analyze the following cell site data and generate an incident report.\n\nSITE DATA:\n- Site ID: {{ $json.Cell_Site_ID }}\n- Site Name: {{ $json.Site_Name }}\n- Region: {{ $json.Region }}\n- Technology: {{ $json.Technology }}\n- Availability: {{ $json.Availability_Pct }}%\n- Throughput: {{ $json.Avg_Throughput_Mbps }} Mbps (Peak: {{ $json.Peak_Throughput_Mbps }} Mbps)\n- Latency: {{ $json.Latency_ms }} ms\n- Packet Loss: {{ $json.Packet_Loss_Pct }}%\n- Active Users Affected: {{ $json.Active_Users }}\n- Alarm: {{ $json.Alarm_Description }}\n\nGenerate a concise incident report with:\n1. SEVERITY ASSESSMENT: Impact on customers and services\n2. PROBABLE CAUSE: Based on the alarm and metrics\n3. RECOMMENDED ACTION: Immediate steps per xFusionCorp SOP\n4. ESTIMATED IMPACT: Revenue and customer impact estimate\n5. ESCALATION: Who should be notified per escalation matrix",
+        "text": "=You are a xFusionCorp Network Operations Center (NOC) analyst. A CRITICAL alarm has been detected. Analyze the following cell site data and generate an incident report.\n\nSITE DATA:\n- Site ID: {{ $json.Cell_Site_ID }}\n- Site Name: {{ $json.Site_Name }}\n- Region: {{ $json.Region }}\n- Technology: {{ $json.Technology }}\n- Availability: {{ $json.Availability_Pct }}%\n- Throughput: {{ $json.Avg_Throughput_Mbps }} Mbps (Peak: {{ $json.Peak_Throughput_Mbps }} Mbps)\n- Latency: {{ $json.Latency_ms }} ms\n- Packet Loss: {{ $json.Packet_Loss_Pct }}%\n- Active Users Affected: {{ $json.Active_Users }}\n- Alarm: {{ $json.Alarm_Description }}\n\nGenerate a concise incident report in HTML format with:\n1. SEVERITY ASSESSMENT: Impact on customers and services\n2. PROBABLE CAUSE: Based on the alarm and metrics\n3. RECOMMENDED ACTION: Immediate steps per xFusionCorp SOP\n4. ESTIMATED IMPACT: Revenue and customer impact estimate\n5. ESCALATION: Who should be notified per escalation matrix\n\nFormat the output as clean, professional HTML suitable for email. Use bold headings and bullet points.",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -125,20 +125,23 @@
       }
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=xFusionCorp CRITICAL Network Alert — {{ new Date().toISOString().split('T')[0] }}",
+        "emailType": "html",
+        "message": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
       "position": [1320, -100],
-      "id": "b1b2c3d4-2001-4000-b001-000000000008",
-      "name": "Critical Output"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
-      "position": [1100, 200],
-      "id": "b1b2c3d4-2001-4000-b001-000000000009",
-      "name": "Warning Log"
+      "id": "b1b2c3d4-2001-4000-b001-000000000010",
+      "name": "Send Alert Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "YOUR_GMAIL_CREDENTIAL"
+        }
+      }
     }
   ],
   "connections": {
@@ -194,13 +197,6 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "Warning Log",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
@@ -208,7 +204,7 @@
       "main": [
         [
           {
-            "node": "Critical Output",
+            "node": "Send Alert Email",
             "type": "main",
             "index": 0
           }

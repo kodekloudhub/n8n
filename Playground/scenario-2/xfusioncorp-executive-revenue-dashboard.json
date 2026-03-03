@@ -1,5 +1,5 @@
 {
-  "name": "xFusionCorp Executive Revenue Dashboard",
+  "name": "xFusionCorp Executive Revenue Dashboard Email",
   "nodes": [
     {
       "parameters": {
@@ -104,6 +104,25 @@
           "name": "YOUR_OPENAIAPI_CREDENTIAL"
         }
       }
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=xFusionCorp Weekly Executive Dashboard — {{ new Date().toISOString().split('T')[0] }}",
+        "emailType": "html",
+        "message": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1100, 0],
+      "id": "c1b2c3d4-3001-4000-c001-000000000009",
+      "name": "Send Dashboard Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "YOUR_GMAIL_CREDENTIAL"
+        }
+      }
     }
   ],
   "connections": {
@@ -172,6 +191,17 @@
         [
           {
             "node": "AI Dashboard Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Dashboard Generator": {
+      "main": [
+        [
+          {
+            "node": "Send Dashboard Email",
             "type": "main",
             "index": 0
           }
