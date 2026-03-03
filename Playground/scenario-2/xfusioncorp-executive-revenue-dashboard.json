@@ -74,8 +74,18 @@
     },
     {
       "parameters": {
+        "jsCode": "const all = $input.all().map(i => i.json);\nconst subscribers = all.filter(r => r.Date);\nconst revenue = all.filter(r => r.Month);\nreturn [{ json: { subscribers, revenue } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [770, 0],
+      "id": "c1b2c3d4-3001-4000-c001-00000000000a",
+      "name": "Aggregate Data"
+    },
+    {
+      "parameters": {
         "promptType": "define",
-        "text": "=You are a senior business analyst at xFusionCorp preparing the weekly executive dashboard for the CEO and CFO.\n\nSUBSCRIBER DATA:\n{{ JSON.stringify($input.all().filter(i => i.json.Date).map(i => i.json)) }}\n\nREVENUE DATA:\n{{ JSON.stringify($input.all().filter(i => i.json.Month).map(i => i.json)) }}\n\nGenerate a comprehensive executive dashboard report in HTML format with:\n\n1. EXECUTIVE SUMMARY (3-4 bullet points with key takeaways)\n2. SUBSCRIBER HEALTH\n   - Total subscriber base across all products\n   - Net adds trend (are we growing or shrinking?)\n   - Churn hotspots by region\n3. REVENUE PERFORMANCE\n   - Total revenue vs. prior month\n   - Top growing product lines (MoM and YoY)\n   - EBITDA margin analysis by business unit\n4. DIGITAL BUSINESS HIGHLIGHTS\n   - xCash revenue share growth\n   - Content & AdTech performance\n5. RISKS AND OPPORTUNITIES\n   - Churn risk areas\n   - Upsell opportunities (e.g., Prepaid-to-Postpaid conversion)\n6. RECOMMENDED ACTIONS (3 prioritized items)\n\nUse professional formatting with HTML tables where appropriate. Include PHP currency formatting for all monetary values.",
+        "text": "=You are a senior business analyst at xFusionCorp preparing the weekly executive dashboard for the CEO and CFO.\n\nSUBSCRIBER DATA:\n{{ JSON.stringify($json.subscribers) }}\n\nREVENUE DATA:\n{{ JSON.stringify($json.revenue) }}\n\nGenerate a comprehensive executive dashboard report in HTML format with:\n\n1. EXECUTIVE SUMMARY (3-4 bullet points with key takeaways)\n2. SUBSCRIBER HEALTH\n   - Total subscriber base across all products\n   - Net adds trend (are we growing or shrinking?)\n   - Churn hotspots by region\n3. REVENUE PERFORMANCE\n   - Total revenue vs. prior month\n   - Top growing product lines (MoM and YoY)\n   - EBITDA margin analysis by business unit\n4. DIGITAL BUSINESS HIGHLIGHTS\n   - xCash revenue share growth\n   - Content & AdTech performance\n5. RISKS AND OPPORTUNITIES\n   - Churn risk areas\n   - Upsell opportunities (e.g., Prepaid-to-Postpaid conversion)\n6. RECOMMENDED ACTIONS (3 prioritized items)\n\nUse professional formatting with HTML tables where appropriate. Include PHP currency formatting for all monetary values.",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -187,6 +197,17 @@
       ]
     },
     "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Data": {
       "main": [
         [
           {
