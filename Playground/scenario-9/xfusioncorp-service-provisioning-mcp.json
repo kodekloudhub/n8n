@@ -1,0 +1,79 @@
+{
+  "name": "xFusionCorp Service Provisioning MCP",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "a9010001-9001-4000-a901-000000000001",
+      "name": "MCP Server Trigger",
+      "webhookId": "a9010001-9001-4000-a901-00000000000a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const accountNumber = $json.account_number || 'UNKNOWN';\nconst planName = $json.plan_name || 'UNKNOWN';\nconst effectiveDate = $json.effective_date || new Date().toISOString().split('T')[0];\n\nreturn [{\n  json: {\n    status: \"SUCCESS\",\n    message: `Plan ${planName} activated for account ${accountNumber}`,\n    effective_date: effectiveDate,\n    confirmation_code: `XFC-ACT-${Date.now()}`,\n    next_billing_date: \"2025-04-01\",\n    notes: \"Customer will receive SMS confirmation within 5 minutes\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, -200],
+      "id": "a9010001-9001-4000-a901-000000000002",
+      "name": "Activate_Plan"
+    },
+    {
+      "parameters": {
+        "jsCode": "const accountNumber = $json.account_number || 'UNKNOWN';\nconst address = $json.address || 'UNKNOWN';\nconst preferredDate = $json.preferred_date || 'Next available';\n\nreturn [{\n  json: {\n    status: \"SUCCESS\",\n    message: `Installation scheduled for ${address}`,\n    account_number: accountNumber,\n    schedule: {\n      date: preferredDate,\n      time_slot: \"9:00 AM - 12:00 PM\",\n      technician: \"Team Bravo\",\n      reference: `XFC-INST-${Date.now()}`\n    },\n    requirements: \"Customer must be present. Ensure clear access to fiber entry point.\",\n    notes: \"Confirmation SMS sent to registered mobile number\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 0],
+      "id": "a9010001-9001-4000-a901-000000000003",
+      "name": "Schedule_Installation"
+    },
+    {
+      "parameters": {
+        "jsCode": "const accountNumber = $json.account_number || 'UNKNOWN';\nconst reason = $json.reason || 'Customer request';\nconst oldSim = $json.old_sim || 'UNKNOWN';\n\nreturn [{\n  json: {\n    status: \"SUCCESS\",\n    message: `SIM swap processed for account ${accountNumber}`,\n    old_sim_status: \"BLOCKED\",\n    new_sim_status: \"PENDING_ACTIVATION\",\n    reference: `XFC-SIM-${Date.now()}`,\n    gcash_alert: \"xCash team notified — account temporarily locked for security\",\n    activation_eta: \"Within 24 hours\",\n    monitoring: \"30-day fraud monitoring activated\",\n    notes: `Reason: ${reason}. Verification completed.`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 200],
+      "id": "a9010001-9001-4000-a901-000000000004",
+      "name": "Process_SIM_Swap"
+    }
+  ],
+  "connections": {
+    "MCP Server Trigger": {
+      "main": [
+        [
+          {
+            "node": "Activate_Plan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule_Installation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process_SIM_Swap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

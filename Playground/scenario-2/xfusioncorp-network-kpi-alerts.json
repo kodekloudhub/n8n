@@ -1,0 +1,238 @@
+{
+  "name": "xFusionCorp Network KPI Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesBetweenTriggers": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "b1b2c3d4-2001-4000-b001-000000000001",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "Playground/scenario-2/xfusioncorp-network-kpis.csv"
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [220, 0],
+      "id": "b1b2c3d4-2001-4000-b001-000000000002",
+      "name": "Read Network KPIs"
+    },
+    {
+      "parameters": {
+        "operation": "csv"
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [440, 0],
+      "id": "b1b2c3d4-2001-4000-b001-000000000003",
+      "name": "Extract From File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.Alarm_Status }}",
+              "rightValue": "NORMAL",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0],
+      "id": "b1b2c3d4-2001-4000-b001-000000000004",
+      "name": "Filter Alarms"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.Alarm_Status }}",
+              "rightValue": "CRITICAL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [880, 0],
+      "id": "b1b2c3d4-2001-4000-b001-000000000005",
+      "name": "Is Critical?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a xFusionCorp Network Operations Center (NOC) analyst. A CRITICAL alarm has been detected. Analyze the following cell site data and generate an incident report.\n\nSITE DATA:\n- Site ID: {{ $json.Cell_Site_ID }}\n- Site Name: {{ $json.Site_Name }}\n- Region: {{ $json.Region }}\n- Technology: {{ $json.Technology }}\n- Availability: {{ $json.Availability_Pct }}%\n- Throughput: {{ $json.Avg_Throughput_Mbps }} Mbps (Peak: {{ $json.Peak_Throughput_Mbps }} Mbps)\n- Latency: {{ $json.Latency_ms }} ms\n- Packet Loss: {{ $json.Packet_Loss_Pct }}%\n- Active Users Affected: {{ $json.Active_Users }}\n- Alarm: {{ $json.Alarm_Description }}\n\nGenerate a concise incident report with:\n1. SEVERITY ASSESSMENT: Impact on customers and services\n2. PROBABLE CAUSE: Based on the alarm and metrics\n3. RECOMMENDED ACTION: Immediate steps per xFusionCorp SOP\n4. ESTIMATED IMPACT: Revenue and customer impact estimate\n5. ESCALATION: Who should be notified per escalation matrix",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1100, -100],
+      "id": "b1b2c3d4-2001-4000-b001-000000000006",
+      "name": "AI Incident Report"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [1100, 100],
+      "id": "b1b2c3d4-2001-4000-b001-000000000007",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1320, -100],
+      "id": "b1b2c3d4-2001-4000-b001-000000000008",
+      "name": "Critical Output"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1100, 200],
+      "id": "b1b2c3d4-2001-4000-b001-000000000009",
+      "name": "Warning Log"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Network KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Network KPIs": {
+      "main": [
+        [
+          {
+            "node": "Extract From File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract From File": {
+      "main": [
+        [
+          {
+            "node": "Filter Alarms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Alarms": {
+      "main": [
+        [
+          {
+            "node": "Is Critical?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Critical?": {
+      "main": [
+        [
+          {
+            "node": "AI Incident Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Warning Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Incident Report": {
+      "main": [
+        [
+          {
+            "node": "Critical Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Incident Report",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

@@ -1,0 +1,245 @@
+{
+  "name": "xFusionCorp Incident Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesBetweenTriggers": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "c7030001-7003-4000-c703-000000000001",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "Playground/scenario-7/xfusioncorp-network-kpis.csv"
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [220, 0],
+      "id": "c7030001-7003-4000-c703-000000000002",
+      "name": "Read Network KPIs"
+    },
+    {
+      "parameters": {
+        "operation": "csv"
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [440, 0],
+      "id": "c7030001-7003-4000-c703-000000000003",
+      "name": "Extract From File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.Alarm_Status }}",
+              "rightValue": "NORMAL",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0],
+      "id": "c7030001-7003-4000-c703-000000000004",
+      "name": "Filter Alarms"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this network alarm data and generate an incident response:\n\n- Site ID: {{ $json.Cell_Site_ID }}\n- Site Name: {{ $json.Site_Name }}\n- Region: {{ $json.Region }}\n- Technology: {{ $json.Technology }}\n- Availability: {{ $json.Availability_Pct }}%\n- Throughput: {{ $json.Avg_Throughput_Mbps }} Mbps\n- Latency: {{ $json.Latency_ms }} ms\n- Packet Loss: {{ $json.Packet_Loss_Pct }}%\n- Active Users: {{ $json.Active_Users }}\n- Alarm: {{ $json.Alarm_Status }} - {{ $json.Alarm_Description }}",
+        "options": {
+          "systemMessage": "You are xFusionCorp's Incident Response Master Agent. You coordinate the response to network alarms.\n\nAnalyze the alarm data provided and generate:\n1. INCIDENT SUMMARY: Brief description of the incident\n2. IMPACT ASSESSMENT: Estimated affected customers, revenue impact, SLA implications\n3. SEVERITY: P1/P2/P3/P4 per xFusionCorp SOP\n4. REQUIRED ACTIONS: List of parallel actions needed\n\nPass the incident details to the Diagnostic Agent for root cause analysis."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [880, 0],
+      "id": "c7030001-7003-4000-c703-000000000005",
+      "name": "Master Incident Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [820, 200],
+      "id": "c7030001-7003-4000-c703-000000000006",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1100, -100],
+      "id": "c7030001-7003-4000-c703-000000000007",
+      "name": "Execute Diagnostic Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1100, 100],
+      "id": "c7030001-7003-4000-c703-000000000008",
+      "name": "Execute Comms Agent"
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [1320, 0],
+      "id": "c7030001-7003-4000-c703-000000000009",
+      "name": "Merge Results"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Network KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Network KPIs": {
+      "main": [
+        [
+          {
+            "node": "Extract From File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract From File": {
+      "main": [
+        [
+          {
+            "node": "Filter Alarms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Alarms": {
+      "main": [
+        [
+          {
+            "node": "Master Incident Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master Incident Agent": {
+      "main": [
+        [
+          {
+            "node": "Execute Diagnostic Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Comms Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Diagnostic Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Comms Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Master Incident Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

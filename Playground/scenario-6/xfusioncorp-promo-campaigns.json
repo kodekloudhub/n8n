@@ -1,0 +1,66 @@
+[
+  {
+    "campaign_id": "PROMO-2025-Q1-001",
+    "campaign_name": "xFiber Unli Upgrade",
+    "status": "ACTIVE",
+    "start_date": "2025-03-01",
+    "end_date": "2025-03-31",
+    "target_segment": "Existing Fiber subscribers on Plan 1299 or below",
+    "offer": "Upgrade to xFiber Plan 1699 with FREE speed boost to 200 Mbps for 6 months. Waived installation fee.",
+    "eligibility": "Active fiber subscriber for 6+ months, no outstanding balance",
+    "channel": ["SMS", "App Push", "Email"],
+    "reply_keywords": {
+      "YES": "Enroll customer in upgrade. Send confirmation.",
+      "INFO": "Send detailed plan comparison.",
+      "NO": "Log opt-out. Do not contact for 30 days."
+    }
+  },
+  {
+    "campaign_id": "PROMO-2025-Q1-002",
+    "campaign_name": "xPlan Loyalty Reward",
+    "status": "ACTIVE",
+    "start_date": "2025-02-15",
+    "end_date": "2025-04-15",
+    "target_segment": "Postpaid subscribers with 3+ years tenure",
+    "offer": "Get FREE 10GB monthly data add-on for 3 months. Plus, earn 2x xRewards points on all purchases.",
+    "eligibility": "Postpaid subscriber for 3+ years, account in good standing",
+    "channel": ["SMS", "App Push"],
+    "reply_keywords": {
+      "CLAIM": "Activate loyalty reward bundle.",
+      "DETAILS": "Send full rewards details and T&C.",
+      "STOP": "Remove from campaign list."
+    }
+  },
+  {
+    "campaign_id": "PROMO-2025-Q1-003",
+    "campaign_name": "xFusionCorp At Home 5G Promo",
+    "status": "ACTIVE",
+    "start_date": "2025-03-10",
+    "end_date": "2025-04-30",
+    "target_segment": "New customers in 5G-covered areas",
+    "offer": "xFusionCorp At Home 5G Plan 1499 with FREE WiFi 6 router. Unlimited data. No lock-in period for first 3 months.",
+    "eligibility": "New customer in 5G coverage area, valid ID, credit check passed",
+    "channel": ["Digital Ads", "Store Walk-in", "Outbound Call"],
+    "reply_keywords": {
+      "APPLY": "Start application process. Schedule installation.",
+      "COVERAGE": "Check 5G coverage in customer's area.",
+      "COMPARE": "Send plan comparison vs competitors."
+    }
+  },
+  {
+    "campaign_id": "PROMO-2025-Q1-004",
+    "campaign_name": "xCash x xFusionCorp Double Load",
+    "status": "ACTIVE",
+    "start_date": "2025-03-01",
+    "end_date": "2025-03-15",
+    "target_segment": "Prepaid users who load via xCash",
+    "offer": "Load PHP 100 via xCash, get PHP 200 worth of call, text, and data. Valid for 7 days.",
+    "eligibility": "Prepaid subscriber, xCash verified account, first-time promo user",
+    "channel": ["xCash App", "SMS"],
+    "reply_keywords": {
+      "DOUBLE": "Activate double load promo.",
+      "TERMS": "Send full terms and conditions.",
+      "OUT": "Opt out of promotional messages."
+    }
+  }
+]

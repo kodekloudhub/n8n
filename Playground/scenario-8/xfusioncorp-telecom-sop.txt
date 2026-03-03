@@ -1,0 +1,118 @@
+XFUSIONCORP - STANDARD OPERATING PROCEDURES (SOP)
+Version 3.2 | Effective: January 2025
+Classification: Internal Use Only (Mock Data for Training Purposes)
+
+=====================================================================
+SECTION 1: CUSTOMER SERVICE - COMPLAINT HANDLING
+=====================================================================
+
+1.1 COMPLAINT CLASSIFICATION
+All customer complaints must be classified into one of the following categories:
+- BILLING: Incorrect charges, disputed amounts, payment issues
+- NETWORK: Signal outage, slow speeds, connectivity problems
+- ACCOUNT: SIM swap, plan changes, account security
+- RETENTION: Churn risk, competitor offers, loyalty concerns
+- ENTERPRISE: Business account requests, site surveys, SLA issues
+
+1.2 PRIORITY LEVELS
+- P1 (CRITICAL): Complete service outage affecting >1000 customers, security breaches, enterprise SLA violations. Response time: 15 minutes. Resolution target: 4 hours.
+- P2 (HIGH): Individual service outage >24 hours, billing disputes >PHP 5000, retention risk (8+ year customers). Response time: 1 hour. Resolution target: 24 hours.
+- P3 (MEDIUM): Intermittent issues, standard billing disputes, plan change requests. Response time: 4 hours. Resolution target: 48 hours.
+- P4 (LOW): General inquiries, feature requests, positive feedback. Response time: 24 hours. Resolution target: 72 hours.
+
+1.3 ESCALATION MATRIX
+- Level 1 (Frontline Agent): Basic troubleshooting, account inquiries, standard requests
+- Level 2 (Senior Agent): Complex billing issues, advanced troubleshooting, retention offers
+- Level 3 (Team Lead): Escalated complaints, NTC-related issues, social media crises
+- Level 4 (Manager): Legal threats, media-covered incidents, VIP enterprise accounts
+
+=====================================================================
+SECTION 2: NETWORK OPERATIONS
+=====================================================================
+
+2.1 NETWORK ALARM HANDLING
+- NORMAL: No action required. Log for reporting.
+- WARNING: Monitor for 30 minutes. If condition persists, create maintenance ticket.
+- CRITICAL: Immediately notify NOC Team Lead. Create P1 incident. Dispatch field team within 2 hours.
+
+2.2 SITE AVAILABILITY THRESHOLDS
+- 5G Sites: Minimum 99.5% availability. Alert if drops below 99%.
+- 4G Sites: Minimum 98.0% availability. Alert if drops below 97%.
+- 3G/Legacy: Minimum 95.0% availability. Alert if drops below 94%.
+
+2.3 THROUGHPUT STANDARDS
+- 5G: Average >200 Mbps, Peak >400 Mbps
+- 4G: Average >50 Mbps, Peak >100 Mbps
+- Fiber (Residential): Deliver minimum 80% of subscribed speed
+- Fiber (Enterprise): Deliver minimum 95% of subscribed speed with SLA guarantee
+
+2.4 INCIDENT RESPONSE PROCEDURE
+1. Detect: Automated monitoring or customer report
+2. Classify: Determine impact scope and severity
+3. Notify: Alert affected teams per escalation matrix
+4. Diagnose: Root cause analysis within 2 hours
+5. Resolve: Apply fix and verify service restoration
+6. Communicate: Update affected customers via SMS/app notification
+7. Document: Complete incident report within 24 hours
+
+=====================================================================
+SECTION 3: BILLING AND REVENUE
+=====================================================================
+
+3.1 BILLING DISPUTE RESOLUTION
+- Disputes <PHP 500: Agent can credit immediately with supervisor approval code
+- Disputes PHP 500-5000: Requires Team Lead review and approval within 24 hours
+- Disputes >PHP 5000: Requires Manager approval and investigation within 48 hours
+- All credits must be logged with reason code and reference ticket number
+
+3.2 RETENTION OFFERS (AUTHORIZED)
+- Customers 1-3 years: 10% discount for 3 months or free data add-on
+- Customers 3-5 years: 15% discount for 6 months or one-tier plan upgrade
+- Customers 5-8 years: 20% discount for 6 months or device discount voucher
+- Customers 8+ years: Up to 25% discount for 12 months, VIP priority support, or matching competitor offer (requires Manager approval)
+
+3.3 REVENUE REPORTING
+- Daily subscriber count reports by 10 AM to Regional Heads
+- Weekly revenue flash reports every Monday to Business Unit Heads
+- Monthly P&L reports by 5th business day to CFO office
+- All reports must include: actuals vs. budget, MoM comparison, YoY comparison
+
+=====================================================================
+SECTION 4: ENTERPRISE SERVICES
+=====================================================================
+
+4.1 ENTERPRISE SITE SURVEY
+- Response to survey request: Within 3 business days
+- Survey completion: Within 5 business days of site visit
+- Proposal delivery: Within 3 business days after survey
+- Installation: Within 15 business days after contract signing
+
+4.2 SLA TIERS
+- Bronze: 99.0% uptime, 8-hour response, business hours support
+- Silver: 99.5% uptime, 4-hour response, extended hours support
+- Gold: 99.9% uptime, 2-hour response, 24/7 support with dedicated account manager
+- Platinum: 99.95% uptime, 1-hour response, 24/7 NOC with proactive monitoring
+
+=====================================================================
+SECTION 5: SECURITY AND FRAUD
+=====================================================================
+
+5.1 SIM SWAP - STOLEN PHONE PROCEDURE
+1. Verify customer identity using 3 of 5 verification points:
+   - Full name and birthdate
+   - Last 4 digits of payment method
+   - Last 3 calls or texts made
+   - Account registration email
+   - Security question answer
+2. Immediately block the old SIM
+3. Flag linked financial services (xCash, banking apps)
+4. Issue new SIM with same number within 24 hours
+5. Send confirmation via registered email
+6. Monitor account for 30 days for suspicious activity
+
+5.2 FRAUD INDICATORS
+- Multiple SIM swap requests within 30 days
+- Unusual international call patterns
+- Sudden spike in data usage (>500% normal)
+- Account access from multiple IPs in different regions
+- Bill payment from unregistered payment methods

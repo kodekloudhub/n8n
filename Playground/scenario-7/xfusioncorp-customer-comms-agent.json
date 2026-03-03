@@ -1,0 +1,80 @@
+{
+  "name": "xFusionCorp Customer Comms Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "b7020001-7002-4000-b702-000000000001",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "You are xFusionCorp's Customer Communication AI Agent. You draft proactive notifications to customers affected by network incidents.\n\nGiven an incident summary, generate:\n1. SMS notification (max 160 chars) — brief, informative, with estimated restoration time\n2. App push notification — slightly longer, include apology and xFusionCorp care hotline\n3. Social media post (if incident affects >5000 users) — transparent, empathetic, with updates timeline\n4. Internal email to customer care team — full incident details for handling inbound calls\n\nUse xFusionCorp's brand voice: caring, transparent, proactive.\nAlways include: \"For concerns, contact xFusionCorp hotline 211 or visit xfusioncorp.com/help\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "b7020001-7002-4000-b702-000000000002",
+      "name": "Customer Comms Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [160, 200],
+      "id": "b7020001-7002-4000-b702-000000000003",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Customer Comms Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Customer Comms Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

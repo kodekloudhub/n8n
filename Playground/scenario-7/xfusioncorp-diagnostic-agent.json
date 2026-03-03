@@ -1,0 +1,80 @@
+{
+  "name": "xFusionCorp Diagnostic Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "a7010001-7001-4000-a701-000000000001",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "You are xFusionCorp's Network Diagnostic AI Agent. You analyze cell site alarms and performance data to determine root cause.\n\nGiven site data, you must:\n1. Analyze all metrics (availability, throughput, latency, packet loss)\n2. Cross-reference the alarm description with common failure patterns\n3. Determine the most likely root cause\n4. Recommend specific diagnostic commands for the field team\n5. Estimate time to restore service\n\nCOMMON FAILURE PATTERNS:\n- \"Power backup failure\": Check generator fuel, battery bank, rectifier status\n- \"Fiber cut\": Check fiber path, OTDR test, contact fiber maintenance team\n- \"RRU failures\": Check RRU power supply, VSWR alarms, antenna connections\n- \"High traffic load\": Check sector capacity, consider load balancing or temporary cell splits\n\nOutput a structured diagnostic report."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "a7010001-7001-4000-a701-000000000002",
+      "name": "Diagnostic Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [160, 200],
+      "id": "a7010001-7001-4000-a701-000000000003",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Diagnostic Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Diagnostic Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

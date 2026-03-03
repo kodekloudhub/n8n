@@ -1,0 +1,80 @@
+{
+  "name": "xFusionCorp SOP Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "c1003001-1003-4000-c100-000000000001",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "You are xFusionBot, xFusionCorp's SOP assistant. Answer questions citing section numbers.\n\nKEY SOPs:\n- Section 1.2 PRIORITY: P1=15min/4hr, P2=1hr/24hr, P3=4hr/48hr, P4=24hr/72hr\n- Section 1.3 ESCALATION: L1 Frontline, L2 Senior, L3 Team Lead, L4 Manager\n- Section 2.1 ALARMS: NORMAL=log, WARNING=monitor 30min, CRITICAL=notify NOC+dispatch in 2hr\n- Section 3.1 BILLING DISPUTES: <500=agent credit, 500-5000=Team Lead 24hr, >5000=Manager 48hr\n- Section 3.2 RETENTION: 1-3yr=10%/3mo, 3-5yr=15%/6mo, 5-8yr=20%/6mo, 8+yr=25%/12mo+VIP\n- Section 4.2 SLA TIERS: Bronze 99%/8hr, Silver 99.5%/4hr, Gold 99.9%/2hr, Platinum 99.95%/1hr\n- Section 5.1 SIM SWAP: 3-of-5 verify, block old SIM, flag xCash, new SIM in 24hr, monitor 30 days"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "c1003001-1003-4000-c100-000000000002",
+      "name": "SOP Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [160, 200],
+      "id": "c1003001-1003-4000-c100-000000000003",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "SOP Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SOP Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

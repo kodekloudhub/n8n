@@ -1,0 +1,201 @@
+{
+  "name": "xFusionCorp Executive Revenue Dashboard",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysBetweenTriggers": 7,
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "c1b2c3d4-3001-4000-c001-000000000001",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "Playground/scenario-3/xfusioncorp-subscriber-report.csv"
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [220, -100],
+      "id": "c1b2c3d4-3001-4000-c001-000000000002",
+      "name": "Read Subscribers"
+    },
+    {
+      "parameters": {
+        "operation": "csv"
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [440, -100],
+      "id": "c1b2c3d4-3001-4000-c001-000000000003",
+      "name": "Parse Subscribers"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileSelector": "Playground/scenario-3/xfusioncorp-revenue-summary.csv"
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [220, 100],
+      "id": "c1b2c3d4-3001-4000-c001-000000000004",
+      "name": "Read Revenue"
+    },
+    {
+      "parameters": {
+        "operation": "csv"
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [440, 100],
+      "id": "c1b2c3d4-3001-4000-c001-000000000005",
+      "name": "Parse Revenue"
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [660, 0],
+      "id": "c1b2c3d4-3001-4000-c001-000000000006",
+      "name": "Merge Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior business analyst at xFusionCorp preparing the weekly executive dashboard for the CEO and CFO.\n\nSUBSCRIBER DATA:\n{{ JSON.stringify($input.all().filter(i => i.json.Date).map(i => i.json)) }}\n\nREVENUE DATA:\n{{ JSON.stringify($input.all().filter(i => i.json.Month).map(i => i.json)) }}\n\nGenerate a comprehensive executive dashboard report in HTML format with:\n\n1. EXECUTIVE SUMMARY (3-4 bullet points with key takeaways)\n2. SUBSCRIBER HEALTH\n   - Total subscriber base across all products\n   - Net adds trend (are we growing or shrinking?)\n   - Churn hotspots by region\n3. REVENUE PERFORMANCE\n   - Total revenue vs. prior month\n   - Top growing product lines (MoM and YoY)\n   - EBITDA margin analysis by business unit\n4. DIGITAL BUSINESS HIGHLIGHTS\n   - xCash revenue share growth\n   - Content & AdTech performance\n5. RISKS AND OPPORTUNITIES\n   - Churn risk areas\n   - Upsell opportunities (e.g., Prepaid-to-Postpaid conversion)\n6. RECOMMENDED ACTIONS (3 prioritized items)\n\nUse professional formatting with HTML tables where appropriate. Include PHP currency formatting for all monetary values.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [880, 0],
+      "id": "c1b2c3d4-3001-4000-c001-000000000007",
+      "name": "AI Dashboard Generator"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [880, 200],
+      "id": "c1b2c3d4-3001-4000-c001-000000000008",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Subscribers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Revenue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Parse Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Revenue": {
+      "main": [
+        [
+          {
+            "node": "Parse Revenue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Revenue": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "AI Dashboard Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Dashboard Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}

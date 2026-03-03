@@ -1,0 +1,150 @@
+{
+  "name": "xFusionCorp Customer 360 Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0],
+      "id": "b8020001-8002-4000-b802-000000000001",
+      "name": "When chat message received",
+      "webhookId": "b8020001-8002-4000-b802-00000000000a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are xFusionCorp's Customer 360 AI Agent. You provide comprehensive customer support by combining:\n- SOP knowledge (embedded below)\n- Customer complaint data (via the Complaint_Lookup tool)\n\nCAPABILITIES:\n1. Answer policy questions using SOPs (from your built-in knowledge below)\n2. Look up customer complaint history (use the Complaint_Lookup tool)\n3. Recommend actions based on SOP + customer context\n4. Generate follow-up scripts for agents\n5. Calculate SLA compliance\n\nINTERACTION STYLE:\n- Professional but friendly\n- Always cite SOP sections when referencing policies\n- Proactively suggest related information\n- When a customer name or ticket ID is mentioned, ALWAYS use the Complaint_Lookup tool first to get context before answering\n\nXFUSIONCORP STANDARD OPERATING PROCEDURES:\n\nSECTION 1: CUSTOMER SERVICE - COMPLAINT HANDLING\n\n1.1 COMPLAINT CLASSIFICATION\n- BILLING: Incorrect charges, disputed amounts, payment issues\n- NETWORK: Signal outage, slow speeds, connectivity problems\n- ACCOUNT: SIM swap, plan changes, account security\n- RETENTION: Churn risk, competitor offers, loyalty concerns\n- ENTERPRISE: Business account requests, site surveys, SLA issues\n\n1.2 PRIORITY LEVELS\n- P1 (CRITICAL): Complete service outage affecting >1000 customers, security breaches, enterprise SLA violations. Response time: 15 minutes. Resolution target: 4 hours.\n- P2 (HIGH): Individual service outage >24 hours, billing disputes >PHP 5000, retention risk (8+ year customers). Response time: 1 hour. Resolution target: 24 hours.\n- P3 (MEDIUM): Intermittent issues, standard billing disputes, plan change requests. Response time: 4 hours. Resolution target: 48 hours.\n- P4 (LOW): General inquiries, feature requests, positive feedback. Response time: 24 hours. Resolution target: 72 hours.\n\n1.3 ESCALATION MATRIX\n- Level 1 (Frontline Agent): Basic troubleshooting, account inquiries, standard requests\n- Level 2 (Senior Agent): Complex billing issues, advanced troubleshooting, retention offers\n- Level 3 (Team Lead): Escalated complaints, NTC-related issues, social media crises\n- Level 4 (Manager): Legal threats, media-covered incidents, VIP enterprise accounts\n\nSECTION 2: NETWORK OPERATIONS\n\n2.1 NETWORK ALARM HANDLING\n- NORMAL: No action required. Log for reporting.\n- WARNING: Monitor for 30 minutes. If condition persists, create maintenance ticket.\n- CRITICAL: Immediately notify NOC Team Lead. Create P1 incident. Dispatch field team within 2 hours.\n\n2.2 SITE AVAILABILITY THRESHOLDS\n- 5G Sites: Minimum 99.5% availability. Alert if drops below 99%.\n- 4G Sites: Minimum 98.0% availability. Alert if drops below 97%.\n\n2.3 THROUGHPUT STANDARDS\n- 5G: Average >200 Mbps, Peak >400 Mbps\n- 4G: Average >50 Mbps, Peak >100 Mbps\n- Fiber (Residential): Deliver minimum 80% of subscribed speed\n- Fiber (Enterprise): Deliver minimum 95% of subscribed speed with SLA guarantee\n\nSECTION 3: BILLING AND REVENUE\n\n3.1 BILLING DISPUTE RESOLUTION\n- Disputes <PHP 500: Agent can credit immediately with supervisor approval code\n- Disputes PHP 500-5000: Requires Team Lead review and approval within 24 hours\n- Disputes >PHP 5000: Requires Manager approval and investigation within 48 hours\n\n3.2 RETENTION OFFERS (AUTHORIZED)\n- Customers 1-3 years: 10% discount for 3 months or free data add-on\n- Customers 3-5 years: 15% discount for 6 months or one-tier plan upgrade\n- Customers 5-8 years: 20% discount for 6 months or device discount voucher\n- Customers 8+ years: Up to 25% discount for 12 months, VIP priority support, or matching competitor offer (requires Manager approval)\n\nSECTION 4: ENTERPRISE SERVICES\n\n4.1 ENTERPRISE SITE SURVEY\n- Response to survey request: Within 3 business days\n- Installation: Within 15 business days after contract signing\n\n4.2 SLA TIERS\n- Bronze: 99.0% uptime, 8-hour response, business hours support\n- Silver: 99.5% uptime, 4-hour response, extended hours support\n- Gold: 99.9% uptime, 2-hour response, 24/7 support with dedicated account manager\n- Platinum: 99.95% uptime, 1-hour response, 24/7 NOC with proactive monitoring\n\nSECTION 5: SECURITY AND FRAUD\n\n5.1 SIM SWAP - STOLEN PHONE PROCEDURE\n1. Verify customer identity using 3 of 5 verification points (name+birthdate, last 4 digits payment, last 3 calls, registration email, security question)\n2. Immediately block the old SIM\n3. Flag linked financial services (xCash, banking apps)\n4. Issue new SIM with same number within 24 hours\n5. Send confirmation via registered email\n6. Monitor account for 30 days for suspicious activity\n\n5.2 FRAUD INDICATORS\n- Multiple SIM swap requests within 30 days\n- Unusual international call patterns\n- Sudden spike in data usage (>500% normal)\n- Account access from multiple IPs in different regions"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "id": "b8020001-8002-4000-b802-000000000002",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [100, 200],
+      "id": "b8020001-8002-4000-b802-000000000003",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAIAPI_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [260, 200],
+      "id": "b8020001-8002-4000-b802-000000000004",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "name": "Complaint_Lookup",
+        "description": "Look up xFusionCorp customer complaints. Returns all customer tickets including ticket ID, customer name, account number, product, region, and complaint description. Use this tool whenever someone asks about a specific customer, ticket, or complaint pattern.",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [420, 200],
+      "id": "b8020001-8002-4000-b802-000000000005",
+      "name": "Complaint_Lookup"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [560, 0],
+      "id": "b8020001-8002-4000-b802-000000000006",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complaint_Lookup": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {},
+  "id": "",
+  "tags": []
+}
